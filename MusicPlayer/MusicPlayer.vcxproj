@@ -47,10 +47,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\CannonJM\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.11\cores\arduino;C:\Users\CannonJM\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.11\variants\standard;d:\MyDocs\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer;D:\MyDocs\Documents\Arduino\libraries\Tone;D:\MyDocs\Documents\Arduino\libraries\Tone\utility;C:\Program Files (x86)\arduino-1.6.7\libraries;C:\Users\CannonJM\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.11\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\55np3wzy.zwm\Micro Platforms\default\debuggers;D:\MyDocs\Documents\Arduino\libraries;C:\Program Files (x86)\arduino-1.6.7\hardware\tools\avr/avr/include/;C:\Program Files (x86)\arduino-1.6.7\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\arduino-1.6.7\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>d:\MyDocs\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\__vm\.MusicPlayer.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;_VMDEBUG=1;F_CPU=16000000L;ARDUINO=10607;ARDUINO_AVR_UNO;ARDUINO_ARCH_AVR;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -75,7 +75,19 @@
       <FileType>CppCode</FileType>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Song.h" />
+    <ClInclude Include="__vm\.MusicPlayer.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Song.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties arduino.upload.port="COM5" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
