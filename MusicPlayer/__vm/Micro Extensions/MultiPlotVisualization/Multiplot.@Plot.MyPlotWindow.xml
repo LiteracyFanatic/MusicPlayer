@@ -4,15 +4,22 @@
     <CurveSettings>
       <CurveId>Frequency</CurveId>
       <CurveDisplayName>Frequency</CurveDisplayName>
-      <CurveLineTicks>Circle</CurveLineTicks>
+      <CurveLineTicks>None</CurveLineTicks>
       <CurveColor>Maroon</CurveColor>
+      <ChartAssignment2>0</ChartAssignment2>
+    </CurveSettings>
+    <CurveSettings>
+      <CurveId>Frequency2</CurveId>
+      <CurveDisplayName>Frequency2</CurveDisplayName>
+      <CurveLineTicks>None</CurveLineTicks>
+      <CurveColor>Silver</CurveColor>
       <ChartAssignment2>0</ChartAssignment2>
     </CurveSettings>
   </CurveSettingCollection>
   <XSweepTime>20 sec</XSweepTime>
   <XTimeFormat>Auto</XTimeFormat>
   <DisplayRefreshRate>AsDataComesIn</DisplayRefreshRate>
-  <ChartType>LineChart</ChartType>
+  <ChartType>AreaChartOpaque</ChartType>
   <OptimizeBinaryCurves>On</OptimizeBinaryCurves>
   <CurveDistribution>SingeChart</CurveDistribution>
   <TriggerEnabled>false</TriggerEnabled>

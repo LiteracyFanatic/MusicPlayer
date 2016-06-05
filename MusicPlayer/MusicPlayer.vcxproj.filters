@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="MusicPlayer.ino" />
+    <None Include="test.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.MusicPlayer.vsarduino.h">
