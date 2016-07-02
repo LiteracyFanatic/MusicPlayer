@@ -1,12 +1,10 @@
 #include <Tone.h>
+#include <gfxfont.h>
 #include "Song.h"
 
 const byte speakerPin = 9;
 const byte switchAPin = 2;
 const byte switchBPin = 3;
-
-Tone tone1;
-Tone tone2;
 
 #pragma region Mario Castle Theme
 
@@ -213,103 +211,262 @@ const struct Song* songList[] =
 	&undertaleSong
 };
 
+
+// IMPORTANT: Adafruit_TFTLCD LIBRARY MUST BE SPECIFICALLY
+// CONFIGURED FOR EITHER THE TFT SHIELD OR THE BREAKOUT BOARD.
+// SEE RELEVANT COMMENTS IN Adafruit_TFTLCD.h FOR SETUP.
+//Technical support:goodtft@163.com
+
+#include <Adafruit_GFX.h>    // Core graphics library
+#include <Adafruit_TFTLCD.h> // Hardware-specific library
+#include <TouchScreen.h>
+
+// The control pins for the LCD can be assigned to any digital or
+// analog pins...but we'll use the analog pins as this allows us to
+// double up the pins with the touch screen (see the TFT paint example).
+#define LCD_CS A3 // Chip Select goes to Analog 3
+#define LCD_CD A2 // Command/Data goes to Analog 2
+#define LCD_WR A1 // LCD Write goes to Analog 1
+#define LCD_RD A0 // LCD Read goes to Analog 0
+
+#define LCD_RESET A4 // Can alternately just connect to Arduino's reset pin
+
+// When using the BREAKOUT BOARD only, use these 8 data lines to the LCD:
+// For the Arduino Uno, Duemilanove, Diecimila, etc.:
+//   D0 connects to digital pin 8  (Notice these are
+//   D1 connects to digital pin 9   NOT in order!)
+//   D2 connects to digital pin 2
+//   D3 connects to digital pin 3
+//   D4 connects to digital pin 4
+//   D5 connects to digital pin 5
+//   D6 connects to digital pin 6
+//   D7 connects to digital pin 7
+// For the Arduino Mega, use digital pins 22 through 29
+// (on the 2-row header at the end of the board).
+
+#define YP A3  // must be an analog pin, use "An" notation!
+#define XM A2  // must be an analog pin, use "An" notation!
+#define YM 9   // can be a digital pin
+#define XP 8   // can be a digital pin
+
+#define TS_MINX 150
+#define TS_MINY 120
+#define TS_MAXX 920
+#define TS_MAXY 940
+
+// For better pressure precision, we need to know the resistance
+// between X+ and X- Use any multimeter to read it
+// For the one we're using, its 300 ohms across the X plate
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
+
+// Assign human-readable names to some common 16-bit color values:
+#define	BLACK   0x0000
+#define GRAY    0xBDF7
+#define	BLUE    0x001F
+#define	RED     0xF800
+#define	GREEN   0x07E0
+#define CYAN    0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW  0xFFE0
+#define WHITE   0xFFFF
+
+Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
+// If using the shield, all control and data lines are fixed, and
+// a simpler declaration can optionally be used:
+// Adafruit_TFTLCD tft;
+
+int cx;
+int cy;
+int buttonSize = 50;
+char label[] = ">";
+
+Adafruit_GFX_Button playPauseButton;
+Adafruit_GFX_Button nextButton;
+Adafruit_GFX_Button previousButton;
+
+int nextButtonX;
+int nextButtonY;
+int nextButtonW;
+int previousButtonX;
+int previousButtonY;
+int previousButtonW;
+
+MusicPlayer mp = MusicPlayer(songList, sizeof(songList) / sizeof(unsigned int));
+#define TONE_1_PIN 22
+#define TONE_2_PIN 24
+
 void setup()
 {
 	//Serial.begin(9600);
-	tone1.begin(24);
-	tone2.begin(26);
+
+	tft.reset();
+
+	uint16_t identifier = tft.readID();
+	if (identifier == 0x9325 ||
+		identifier == 0x9328 ||
+		identifier == 0x4535 ||
+		identifier == 0x7575 ||
+		identifier == 0x9341 ||
+		identifier == 0x8357)
+	{
+
+	}
+	else if (identifier == 0x0101)
+	{
+		identifier = 0x9341;
+	}
+	else {
+		identifier = 0x9341;
+	}
+
+	tft.begin(identifier);
+
+	tft.setRotation(3);
+
+	tft.fillScreen(BLACK);
+
+	cx = tft.width() / 2;
+	cy = tft.height() / 2;
+
+	//  for (int i = 0; i < tft.width(); i += 5) {
+	//    if (i % 2) {
+	//      tft.drawFastVLine(i, 0, tft.height(), GRAY);
+	//    } else {
+	//      tft.drawFastVLine(i, 0, tft.height(), BLUE);
+	//    }
+	//  }
+
+	tft.fillTriangle(cx - buttonSize / 2, cy - buttonSize / 2, cx + buttonSize / 2, cy, cx - buttonSize / 2, cy + buttonSize / 2, WHITE);
+
+	playPauseButton.initButton(&tft, cx, cy, buttonSize, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
+	//playPauseButton.drawButton(false);
+
+	nextButtonX = tft.width() - (buttonSize * 2) - 2;
+	nextButtonY = cy - buttonSize / 2;
+	previousButtonX = 20;
+	previousButtonY = cy - buttonSize / 2;
+
+	nextButtonW = drawNextButton(nextButtonX, nextButtonY, buttonSize, WHITE);
+	previousButtonW = drawPreviousButton(previousButtonX, previousButtonY, buttonSize, WHITE);
+
+	nextButton.initButton(&tft, nextButtonX + nextButtonW / 2, nextButtonY + buttonSize / 2, nextButtonW, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
+	//nextButton.drawButton(false);
+	previousButton.initButton(&tft, previousButtonX + previousButtonW / 2, previousButtonY + buttonSize / 2, previousButtonW, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
+	//previousButton.drawButton(false);
+
 	/*Serial.print("sizeof(int) = "); Serial.println(sizeof(int));
 	Serial.print("sizeof(int*) = "); Serial.println(sizeof(int*));
 	Serial.print("eagleLength = "); Serial.println(pgm_read_word(&(songList[0]->songLength)));
 	Serial.print("bachLength = "); Serial.println(pgm_read_word(&(songList[1]->songLength)));
 	Serial.print("nyanCatLength = "); Serial.println(pgm_read_word(&(songList[0]->songLength)));
 	Serial.print("undertaleLength = "); Serial.println(pgm_read_word(&(songList[0]->songLength)));
-	Serial.print("eagleLength = "); Serial.println(eagleLength);
 	Serial.print("bachLength = "); Serial.println(bachLength);
 	Serial.print("nyanCatLength = "); Serial.println(nyanCatLength);
 	Serial.print("undertaleLength = "); Serial.println(undertaleLength);*/
+
+	mp.start(22, 24);
 }
+
+#define MINPRESSURE 10
+#define MAXPRESSURE 1000
+
+bool paused = true;
 
 void loop()
 {
-	byte i = 0;
+	updateScreen();
 
-	while (i < sizeof(songList) / sizeof(unsigned int))
+	if (!paused)
 	{
-		//waitForButtonPress(switchAPin);
-		//Serial.print("Number of Songs = "); Serial.println(sizeof(songList) / sizeof(unsigned int));
-		playSong(songList[i]);
-		i++;
+		mp.playCurrentSong();
 	}
+
+	//byte i = 0;
+
+	//while (i < sizeof(songList) / sizeof(unsigned int))
+	//{
+	//	//waitForButtonPress(switchAPin);
+	//	//Serial.print("Number of Songs = "); Serial.println(sizeof(songList) / sizeof(unsigned int));
+	//	updateScreen();
+	//	if (!paused)
+	//	{
+	//		//playSong(songList[i]);
+	//		i++;
+	//	}
+	//}
 }
 
-void playSong(const struct Song* song)
-{
-	bool part1Exists = pgm_read_word(&(song->notes1)) && pgm_read_word(&(song->times1));
-	bool part2Exists = pgm_read_word(&(song->notes2)) && pgm_read_word(&(song->times2));
-	//Serial.print("Part 1 Exists = "); Serial.println(part1Exists);
-	//Serial.print("Part 2 Exists = "); Serial.println(part2Exists);
-
-	int i = -1;
-	unsigned long t1 = 0;
-	int j = -1;
-	unsigned long t2 = 0;
-
-	unsigned int curNote1 = 0;
-	unsigned int curTime1 = 0;
-	unsigned int curNote2 = 0;
-	unsigned int curTime2 = 0;
-
-	int noteLen = pgm_read_word(&(song->songLength));
-	//Serial.println(noteLen);
-	unsigned long dt;
-	unsigned long ti = millis();
-
-	while (i < noteLen && j < noteLen)
-	{
-		dt = millis();
-
-		if (part1Exists && (dt >= t1 + ti))
-		{
-			tone1.stop();
-			delay(5);
-			i++;
-
-			curNote1 = pgm_read_word(pgm_read_word(&(song->notes1)) + i * sizeof(unsigned int));
-			curTime1 = pgm_read_word(pgm_read_word(&(song->times1)) + i * sizeof(unsigned int));
-
-			//Serial.print("curNote = "); Serial.println(curNote);
-			//Serial.print("curTime = "); Serial.println(curTime);
-			t1 += curTime1;
-			tone1.play(curNote1, curTime1);
-		}
-
-		//dt = millis();
-
-		if (part2Exists && (dt >= t2 + ti))
-		{
-			tone2.stop();
-			delay(5);
-			j++;
-
-			curNote2 = pgm_read_word(pgm_read_word(&(song->notes2)) + j * sizeof(unsigned int));
-			curTime2 = pgm_read_word(pgm_read_word(&(song->times2)) + j * sizeof(unsigned int));
-
-			t2 += curTime2;
-			tone2.play(curNote2, curTime2);
-		}
-
-		if (digitalRead(switchAPin) || digitalRead(switchBPin))
-		{
-			tone1.stop();
-			tone2.stop();
-			return;
-		}
-	}
-	//Serial.println("Done");
-	tone1.stop();
-	tone2.stop();
-}
+//void playSong(const struct Song* song)
+//{
+//	bool part1Exists = pgm_read_word(&(song->notes1)) && pgm_read_word(&(song->times1));
+//	bool part2Exists = pgm_read_word(&(song->notes2)) && pgm_read_word(&(song->times2));
+//	//Serial.print("Part 1 Exists = "); Serial.println(part1Exists);
+//	//Serial.print("Part 2 Exists = "); Serial.println(part2Exists);
+//
+//	int i = -1;
+//	unsigned long t1 = 0;
+//	int j = -1;
+//	unsigned long t2 = 0;
+//
+//	unsigned int curNote1 = 0;
+//	unsigned int curTime1 = 0;
+//	unsigned int curNote2 = 0;
+//	unsigned int curTime2 = 0;
+//
+//	int noteLen = pgm_read_word(&(song->songLength));
+//	Serial.println(noteLen);
+//	unsigned long dt;
+//	unsigned long ti = millis();
+//
+//	while (i < noteLen && j < noteLen)
+//	{
+//		dt = millis();
+//
+//		if (part1Exists && (dt >= t1 + ti))
+//		{
+//			tone1.stop();
+//			delay(5);
+//			i++;
+//
+//			curNote1 = pgm_read_word(pgm_read_word(&(song->notes1)) + i * sizeof(unsigned int));
+//			curTime1 = pgm_read_word(pgm_read_word(&(song->times1)) + i * sizeof(unsigned int));
+//
+//			//Serial.print("curNote2 = "); Serial.println(curNote1);
+//			//Serial.print("curTime1 = "); Serial.println(curTime1);
+//			t1 += curTime1;
+//			tone1.play(curNote1, curTime1);
+//		}
+//
+//		//dt = millis();
+//
+//		if (part2Exists && (dt >= t2 + ti))
+//		{
+//			tone2.stop();
+//			delay(5);
+//			j++;
+//
+//			curNote2 = pgm_read_word(pgm_read_word(&(song->notes2)) + j * sizeof(unsigned int));
+//			curTime2 = pgm_read_word(pgm_read_word(&(song->times2)) + j * sizeof(unsigned int));
+//
+//			//Serial.print("curNote2 = "); Serial.println(curNote2);
+//			//Serial.print("curTime2 = "); Serial.println(curTime2);
+//			t2 += curTime2;
+//			tone2.play(curNote2, curTime2);
+//		}
+//
+//		/*if (digitalRead(switchAPin) || digitalRead(switchBPin))
+//		{
+//			tone1.stop();
+//			tone2.stop();
+//			return;
+//		}*/
+//
+//		updateScreen();
+//	}
+//	//Serial.println("Done");
+//	tone1.stop();
+//	tone2.stop();
+//}
 
 void waitForButtonPress(byte buttonPin)
 {
@@ -317,3 +474,134 @@ void waitForButtonPress(byte buttonPin)
 	while (!digitalRead(buttonPin)) {};
 	while (digitalRead(buttonPin)) {};
 }
+
+void drawPlayButton(unsigned int color) {
+	tft.fillTriangle(cx - buttonSize / 2, cy - buttonSize / 2, cx + buttonSize / 2, cy, cx - buttonSize / 2, cy + buttonSize / 2, color);
+}
+
+void drawPauseButton(unsigned int color) {
+	tft.fillRect(cx - buttonSize / 2, cy - buttonSize / 2, 15, buttonSize, color);
+	tft.fillRect(cx + (buttonSize / 2) - 15, cy - buttonSize / 2, 15, buttonSize, color);
+}
+
+int drawNextButton(int x, int y, int h, unsigned int color) {
+	int w = (h * 2) - 18;
+	//  tft.drawRect(x, y, w, h, RED);
+	tft.fillTriangle(x, y, x + h, y + h / 2, x, y + h, color);
+	x += (h)-20;
+	tft.fillTriangle(x, y, x + h, y + h / 2, x, y + h, color);
+	x += (h)-5;
+	tft.fillRect(x, y, 7, h, color);
+	return w;
+}
+
+int drawPreviousButton(int x, int y, int h, unsigned int color) {
+	int w = (h * 2) - 18;
+	//  tft.drawRect(x, y, w, h, RED);
+	tft.fillRect(x, y, 7, h, color);
+	x += 2;
+	tft.fillTriangle(x, y + h / 2, x + h, y, x + h, y + h, color);
+	x += (h)-20;
+	tft.fillTriangle(x, y + h / 2, x + h, y, x + h, y + h, color);
+	return w;
+}
+
+void updateScreen() {
+	digitalWrite(13, HIGH);
+	TSPoint p = ts.getPoint();
+	digitalWrite(13, LOW);
+
+	// if sharing pins, you'll need to fix the directions of the touchscreen pins
+	//pinMode(XP, OUTPUT);
+	pinMode(XM, OUTPUT);
+	pinMode(YP, OUTPUT);
+	//pinMode(YM, OUTPUT);
+
+	//Serial.print("p.x = "); Serial.println(p.x);
+	//Serial.print("p.y = "); Serial.println(p.y);
+
+	if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+		// scale from 0->1023 to tft.width
+		int tempPY = p.y;
+		p.y = (map(p.x, TS_MINX, TS_MAXX, 0, tft.height()));
+		p.x = (map(tempPY, TS_MINY, TS_MAXY, 0, tft.width()));
+	}
+
+	//  tft.fillCircle(p.x, p.y, 3, WHITE);
+	//
+	//  tft.fillRect(0, 0, 300, 25, BLACK);
+	//  tft.setCursor(0, 0);
+	//  tft.setTextColor(WHITE);  tft.setTextSize(2);
+	//  tft.print("X: "); tft.print(p.x); tft.print(" Y: "); tft.print(p.y); tft.print(" Z: "); tft.print(p.z);
+
+	if (playPauseButton.contains(p.x, p.y)) {
+		//Serial.print("Pressing: "); Serial.println(b);
+		playPauseButton.press(true);  // tell the button it is pressed
+	}
+	else {
+		playPauseButton.press(false);  // tell the button it is NOT pressed
+	}
+
+	if (playPauseButton.justPressed()) {
+		if (paused) {
+			drawPlayButton(GRAY);
+		}
+		else {
+			drawPlayButton(BLACK);
+			drawPauseButton(GRAY);
+		}
+	}
+
+	if (playPauseButton.justReleased()) {
+		//playPauseButton.drawButton();
+		paused = !paused;
+		//playPauseButton.drawButton(true);
+
+		if (paused) {
+			drawPauseButton(BLACK);
+			drawPlayButton(WHITE);
+		}
+		else {
+			drawPlayButton(BLACK);
+			drawPauseButton(WHITE);
+		}
+	}
+
+	if (nextButton.contains(p.x, p.y)) {
+		//Serial.print("Pressing: "); Serial.println("nextButton");
+		nextButton.press(true);  // tell the button it is pressed
+	}
+	else {
+		nextButton.press(false);  // tell the button it is NOT pressed
+	}
+
+	if (nextButton.justPressed()) {
+		drawNextButton(nextButtonX, nextButtonY, buttonSize, GRAY);
+	}
+
+	if (nextButton.justReleased()) {
+		drawNextButton(nextButtonX, nextButtonY, buttonSize, WHITE);
+	}
+
+	if (previousButton.contains(p.x, p.y)) {
+		//Serial.print("Pressing: "); Serial.println(b);
+		previousButton.press(true);  // tell the button it is pressed
+	}
+	else {
+		previousButton.press(false);  // tell the button it is NOT pressed
+	}
+
+	if (previousButton.justPressed()) {
+		drawPreviousButton(previousButtonX, previousButtonY, buttonSize, GRAY);
+	}
+
+	if (previousButton.justReleased()) {
+		drawPreviousButton(previousButtonX, previousButtonY, buttonSize, WHITE);
+	}
+
+	//delay(100);
+}
+
+
+
+
