@@ -216,8 +216,8 @@ const struct Song* songList[] =
 void setup()
 {
 	//Serial.begin(9600);
-	tone1.begin(9);
-	tone2.begin(10);
+	tone1.begin(24);
+	tone2.begin(26);
 	/*Serial.print("sizeof(int) = "); Serial.println(sizeof(int));
 	Serial.print("sizeof(int*) = "); Serial.println(sizeof(int*));
 	Serial.print("eagleLength = "); Serial.println(pgm_read_word(&(songList[0]->songLength)));
@@ -236,7 +236,7 @@ void loop()
 
 	while (i < sizeof(songList) / sizeof(unsigned int))
 	{
-		waitForButtonPress(switchAPin);
+		//waitForButtonPress(switchAPin);
 		//Serial.print("Number of Songs = "); Serial.println(sizeof(songList) / sizeof(unsigned int));
 		playSong(songList[i]);
 		i++;
