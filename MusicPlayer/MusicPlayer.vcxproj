@@ -78,7 +78,6 @@
     <None Include="MusicPlayer.ino">
       <FileType>CppCode</FileType>
     </None>
-    <None Include="test.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Song.h" />

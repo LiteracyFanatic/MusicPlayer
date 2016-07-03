@@ -11,6 +11,7 @@
 #ifndef _VSARDUINO_H_
 #define _VSARDUINO_H_
 #define __AVR_ATmega2560__
+#define _VMDEBUG 1
 #define F_CPU 16000000L
 #define ARDUINO 10607
 #define ARDUINO_AVR_MEGA2560
@@ -50,5 +51,4 @@ extern "C" void __cxa_pure_virtual() {;}
 #include <MusicPlayer.ino>
 #include <Song.cpp>
 #include <Song.h>
-#include <test.ino>
 #endif
