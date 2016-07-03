@@ -218,44 +218,43 @@ const struct Song nyanCatSong PROGMEM =
 };
 #pragma endregion
 
-const unsigned int testNotes1[] PROGMEM =
-{
-	NOTE_A4
-};
-
-const unsigned int testTimes1[] PROGMEM =
-{
-	2000
-};
-
-const unsigned int testNotes2[] PROGMEM =
-{
-	NOTE_D4, NOTE_E5, NOTE_FS4, NOTE_G5
-};
-
-const unsigned int testTimes2[] PROGMEM =
-{
-	500, 100, 100, 500
-};
-
-const unsigned int testNotes1Length PROGMEM = sizeof(testNotes1) / sizeof(unsigned int);
-const unsigned int testNotes2Length PROGMEM = sizeof(testNotes2) / sizeof(unsigned int);
-
-const struct Song testSong PROGMEM =
-{
-	testNotes1,
-	testTimes1,
-	testNotes2,
-	testTimes2,
-	testNotes1Length,
-	testNotes2Length,
-	NULL,
-	NULL
-};
+//const unsigned int testNotes1[] PROGMEM =
+//{
+//	NOTE_A4, NOTE_A4, NOTE_A4, NOTE_A4
+//};
+//
+//const unsigned int testTimes1[] PROGMEM =
+//{
+//	1000, 1000, 1000, 3000
+//};
+//
+//const unsigned int testNotes2[] PROGMEM =
+//{
+//	NOTE_D4, NOTE_E5, NOTE_FS5, NOTE_G5
+//};
+//
+//const unsigned int testTimes2[] PROGMEM =
+//{
+//	1000, 1000, 1000, 3000
+//};
+//
+//const unsigned int testNotes1Length PROGMEM = sizeof(testNotes1) / sizeof(unsigned int);
+//const unsigned int testNotes2Length PROGMEM = sizeof(testNotes2) / sizeof(unsigned int);
+//
+//const struct Song testSong PROGMEM =
+//{
+//	testNotes1,
+//	testTimes1,
+//	testNotes2,
+//	testTimes2,
+//	testNotes1Length,
+//	testNotes2Length,
+//	NULL,
+//	NULL
+//};
 
 const struct Song* songList[] =
 {
-	&testSong,
 	&castleSong,
 	&marioSong,
 	&bachDoubleSong,
@@ -349,7 +348,6 @@ MusicPlayer mp = MusicPlayer(songList, sizeof(songList) / sizeof(unsigned int));
 
 const char* titles[7] =
 {
-	"Test Song",
 	"Mario Castle",
 	"Mario Tune",
 	"Bach Double",
@@ -386,10 +384,16 @@ void setup()
 
 	tft.setRotation(3);
 
-	tft.fillScreen(BLACK);
-
 	cx = tft.width() / 2;
 	cy = tft.height() / 2;
+
+	tft.fillScreen(BLACK);
+
+	drawArduinoLogo(BLUE);
+
+	waitForTap(5000);
+
+	tft.fillScreen(BLACK);
 
 	tft.fillTriangle(cx - buttonSize / 2, cy - buttonSize / 2, cx + buttonSize / 2, cy, cx - buttonSize / 2, cy + buttonSize / 2, WHITE);
 
@@ -426,22 +430,31 @@ void setup()
 #define MINPRESSURE 10
 #define MAXPRESSURE 1000
 
+unsigned long t = 0;
+
 void loop()
 {
 	updateScreen();
 
 	mp.run();
+
 	if (mp.songDone)
 	{
-		mp.nextSong();
-		mp.songDone = false;
-
-		// LAZY -- DO THIS BETTER LATER
-
-		delay(1500);
-
-		// LAZY -- DO THIS BETTER LATER
+		if (t == 0)
+		{
+			t = millis() + (unsigned long)1500;
+		}
+		if (millis() >= t && !mp.paused)
+		{
+			mp.nextSong();
+			mp.songDone = false;
+		}
 	}
+	else
+	{
+		t = 0;
+	}
+
 }
 
 
@@ -459,7 +472,7 @@ int drawNextButton(int x, int y, int h, unsigned int color) {
 	tft.fillTriangle(x, y, x + h, y + h / 2, x, y + h, color);
 	x += h - 20;
 	tft.fillTriangle(x, y, x + h, y + h / 2, x, y + h, color);
-	x += h -5;
+	x += h - 5;
 	tft.fillRect(x, y, 7, h, color);
 	return w;
 }
@@ -474,9 +487,45 @@ int drawPreviousButton(int x, int y, int h, unsigned int color) {
 	return w;
 }
 
+void drawArduinoLogo(unsigned int color)
+{
+	int outerRadius = 80;
+	int innderRadius = outerRadius - 30;
+	int overlap = 10;
+	int leftCenterX = cx - (outerRadius - overlap);
+	int rightCenterX = cx + (outerRadius - overlap);
+	int centerY = cy - 30;
+
+	tft.fillCircle(leftCenterX, centerY, outerRadius, color);
+	tft.fillCircle(rightCenterX, centerY, outerRadius, color);
+	tft.fillCircle(leftCenterX, centerY, innderRadius, BLACK);
+	tft.fillCircle(rightCenterX, centerY, innderRadius, BLACK);
+
+	tft.fillRect(leftCenterX - 25, centerY - 7, 50, 14, color);
+
+	tft.fillRect(rightCenterX - 20, centerY - 7, 40, 14, color);
+	tft.fillRect(rightCenterX - 7, centerY - 20, 14, 40, color);
+
+	tft.setCursor(5, 185);
+	tft.setTextSize(6);
+	tft.setTextWrap(false);
+	tft.setTextColor(color);
+
+	char text[] = "Noteduino";
+
+	delay(400);
+
+	for (byte i = 0; i < sizeof(text) / sizeof(char) - 1; i++)
+	{
+		delay(50);
+		tft.print(text[i]);
+
+	}
+}
+
 void displayTitle() {
 	tft.fillRect(0, 0, tft.width(), 40, BLACK);
-	tft.setCursor(10, 10);	
+	tft.setCursor(10, 10);
 	tft.setTextSize(3);
 
 	tft.setTextColor(WHITE);
@@ -487,7 +536,7 @@ void displayTitle() {
 	}
 
 	Serial.println(mp.title());*/
-	
+
 }
 
 byte prevSong = 0;
@@ -586,10 +635,59 @@ void updateScreen() {
 		displayTitle();
 		prevSong = mp.currentSong();
 	}
-	
 
 }
 
+void waitForTap() {
+	bool done = false;
+	while (!done)
+	{
+		digitalWrite(13, HIGH);
+		TSPoint p = ts.getPoint();
+		digitalWrite(13, LOW);
 
+		// if sharing pins, you'll need to fix the directions of the touchscreen pins
+		//pinMode(XP, OUTPUT);
+		pinMode(XM, OUTPUT);
+		pinMode(YP, OUTPUT);
+		//pinMode(YM, OUTPUT);
+
+		if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+			done = true;
+		}
+	}
+
+}
+
+void waitForTap(unsigned long waitTime) 
+{
+	bool done = false;
+	unsigned long ti = millis();
+	while (!done)
+	{
+		digitalWrite(13, HIGH);
+		TSPoint p = ts.getPoint();
+		digitalWrite(13, LOW);
+
+		// if sharing pins, you'll need to fix the directions of the touchscreen pins
+		//pinMode(XP, OUTPUT);
+		pinMode(XM, OUTPUT);
+		pinMode(YP, OUTPUT);
+		//pinMode(YM, OUTPUT);
+
+		if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+			done = true;
+		}
+
+		if (waitTime != NULL)
+		{
+			if (millis() >= ti + waitTime)
+			{
+				done = true;
+			}
+		}
+	}
+
+}
 
 

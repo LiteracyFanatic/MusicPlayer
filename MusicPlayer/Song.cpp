@@ -13,8 +13,8 @@ MusicPlayer::MusicPlayer(const struct Song* *sl, byte n)
 	t2 = 0;
 	ti = NULL;
 	paused = 0;
-	i = -1;
-	j = -1;
+	note1Index = 0;
+	note2Index = 0;
 	songDone = false;
 	paused = true;
 	pausedTime = 0;
@@ -33,8 +33,8 @@ void MusicPlayer::currentSong(byte cs)
 	t1 = 0;
 	t2 = 0;
 	ti = NULL;
-	i = -1;
-	j = -1;
+	note1Index = 0;
+	note2Index = 0;
 	songDone = false;
 	pausedTime = 0;
 }
@@ -105,6 +105,11 @@ const char* MusicPlayer::title()
 
 void  MusicPlayer::playSong(const struct Song* song)
 {
+	if (songDone)
+	{
+		return;
+	}
+
 	if (ti == NULL)
 	{
 		ti = millis();
@@ -124,8 +129,8 @@ void  MusicPlayer::playSong(const struct Song* song)
 	pausedTime = 0;
 
 
-	bool part1Exists = pgm_read_word(&(song->notes1)) && pgm_read_word(&(song->times1));
-	bool part2Exists = pgm_read_word(&(song->notes2)) && pgm_read_word(&(song->times2));
+	bool part1Exists = pgm_read_word(&(song->notes1)); //&& pgm_read_word(&(song->times1));
+	bool part2Exists = pgm_read_word(&(song->notes2)); //&& pgm_read_word(&(song->times2));
 
 	unsigned int curNote1 = 0;
 	unsigned int curTime1 = 0;
@@ -140,19 +145,17 @@ void  MusicPlayer::playSong(const struct Song* song)
 
 	//dv(curTime1);
 
-
-
 	dt = millis();
 
 	if (part1Exists && (dt >= t1 + ti))
 	{
 		tone1.stop();
 		delay(5);
-		i++;
 
-		curNote1 = pgm_read_word(pgm_read_word(&(song->notes1)) + i * sizeof(unsigned int));
-		curTime1 = pgm_read_word(pgm_read_word(&(song->times1)) + i * sizeof(unsigned int));
+		curNote1 = pgm_read_word(pgm_read_word(&(song->notes1)) + note1Index * sizeof(unsigned int));
+		curTime1 = pgm_read_word(pgm_read_word(&(song->times1)) + note1Index * sizeof(unsigned int));
 
+		note1Index++;
 		//Serial.print("curNote1 = "); Serial.println(curNote1);
 		//Serial.print("curTime1 = "); Serial.println(curTime1);
 		t1 += (long) curTime1;
@@ -163,39 +166,35 @@ void  MusicPlayer::playSong(const struct Song* song)
 	{
 		tone2.stop();
 		delay(5);
-		j++;
 
-		curNote2 = pgm_read_word(pgm_read_word(&(song->notes2)) + j * sizeof(unsigned int));
-		curTime2 = pgm_read_word(pgm_read_word(&(song->times2)) + j * sizeof(unsigned int));
-
+		curNote2 = pgm_read_word(pgm_read_word(&(song->notes2)) + note2Index * sizeof(unsigned int));
+		curTime2 = pgm_read_word(pgm_read_word(&(song->times2)) + note2Index * sizeof(unsigned int));
+		
+		note2Index++;
 		//Serial.print("curNote2 = "); Serial.println(curNote2);
 		//Serial.print("curTime2 = "); Serial.println(curTime2);
 		t2 += (long) curTime2;
 		tone2.play(curNote2, curTime2);
 	}
 
-	// MAJOR BUG -- FIX IT
-
-	if (i > noteLen1 - 1)
+	if (note1Index > noteLen1)
 	{
 		tone1.stop();
 	}
-	if (j > noteLen2 - 1)
+	if (note2Index > noteLen2)
 	{
 		tone2.stop();
 	}
-	if ((!part1Exists || i >= noteLen1) && (!part2Exists || j >= noteLen2))
+	if ((!part1Exists || note1Index > noteLen1) && (!part2Exists || note2Index > noteLen2))
 	{
 		songDone = true;
-		i = -1;
-		j = -1;
+		note1Index = -1;
+		note2Index = -1;
 		ti = NULL;
 		t1 = 0;
 		t2 = 0;
 		return;
 	}
-
-	// MAJOR BUG -- FIX IT
 
 }
 

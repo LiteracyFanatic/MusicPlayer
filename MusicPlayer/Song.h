@@ -50,8 +50,8 @@ private:
 	unsigned long t2;
 	unsigned long dt;
 	unsigned long pausedTime;
-	int i;
-	int j;
+	int note1Index;
+	int note2Index;
 };
 
 
