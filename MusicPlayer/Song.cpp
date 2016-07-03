@@ -1,7 +1,8 @@
 #include <Tone.h>
 #include "Song.h"
 
-
+#define dv(v) Serial.print(#v); Serial.print(" = "); Serial.println(v);
+	
 
 MusicPlayer::MusicPlayer(const struct Song* *sl, byte n)
 {
@@ -35,6 +36,7 @@ void MusicPlayer::currentSong(byte cs)
 	i = -1;
 	j = -1;
 	songDone = false;
+	pausedTime = 0;
 }
 
 byte MusicPlayer::currentSong()
@@ -66,7 +68,7 @@ void MusicPlayer::previousSong()
 	}
 }
 
-void MusicPlayer::playCurrentSong()
+void MusicPlayer::run()
 {
 	playSong(songList[curSong]);
 }
@@ -112,15 +114,11 @@ void  MusicPlayer::playSong(const struct Song* song)
 	{
 		if (ti != NULL)
 		{
-			//Serial.print("dt = "); Serial.println(dt);
 			pausedTime = dt ? (millis() - dt) : (millis() - ti);
-			//Serial.print("pausedTime = "); Serial.println(pausedTime);
 		}
 		return;
 	}
 
-	//Serial.print("pausedTime = "); Serial.println(pausedTime);
-	//ti += pausedTime;
 	t1 += pausedTime;
 	t2 += pausedTime;
 	pausedTime = 0;
@@ -128,56 +126,26 @@ void  MusicPlayer::playSong(const struct Song* song)
 
 	bool part1Exists = pgm_read_word(&(song->notes1)) && pgm_read_word(&(song->times1));
 	bool part2Exists = pgm_read_word(&(song->notes2)) && pgm_read_word(&(song->times2));
-	//Serial.print("Part 1 Exists = "); Serial.println(part1Exists);
-	//Serial.print("Part 2 Exists = "); Serial.println(part2Exists);
-
-	//int i = -1;
-	//unsigned long t1 = 0;
-	//int j = -1;
-	//unsigned long t2 = 0;
 
 	unsigned int curNote1 = 0;
 	unsigned int curTime1 = 0;
 	unsigned int curNote2 = 0;
 	unsigned int curTime2 = 0;
 
-	int noteLen = pgm_read_word(&(song->songLength));
-	//Serial.print("number of notes = "); Serial.println(noteLen);
+	int noteLen1 = pgm_read_word(&(song->notes1Length));
+	int noteLen2 = pgm_read_word(&(song->notes2Length));
 
-	//unsigned long ti = millis();
+	//Serial.print("noteLen1 = "); Serial.println(noteLen1);
+	//Serial.print("noteLen2 = "); Serial.println(noteLen2);
 
-	//Serial.print("ti = "); Serial.println(ti);
+	//dv(curTime1);
 
-
-	//Serial.print("ti = "); Serial.println(ti);
-
-	//Serial.print("i = "); Serial.println(i);
-	//Serial.print("j = "); Serial.println(j);
-	//Serial.print("noteLen = "); Serial.println(noteLen);
-
-	if (i >= noteLen - 1 && j >= noteLen - 1)
-	{
-		songDone = true;
-		tone1.stop();
-		tone2.stop();
-		i = -1;
-		j = -1;
-		ti = NULL;
-		t1 = 0;
-		t2 = 0;
-		return;
-	}
 
 
 	dt = millis();
 
-	//Serial.print("dt = "); Serial.println(dt);
-	//Serial.print("t1 = "); Serial.println(t1);
-	//Serial.print("ti = "); Serial.println(ti);
-
 	if (part1Exists && (dt >= t1 + ti))
 	{
-		Serial.println("in part 1");
 		tone1.stop();
 		delay(5);
 		i++;
@@ -205,6 +173,29 @@ void  MusicPlayer::playSong(const struct Song* song)
 		t2 += (long) curTime2;
 		tone2.play(curNote2, curTime2);
 	}
+
+	// MAJOR BUG -- FIX IT
+
+	if (i > noteLen1 - 1)
+	{
+		tone1.stop();
+	}
+	if (j > noteLen2 - 1)
+	{
+		tone2.stop();
+	}
+	if ((!part1Exists || i >= noteLen1) && (!part2Exists || j >= noteLen2))
+	{
+		songDone = true;
+		i = -1;
+		j = -1;
+		ti = NULL;
+		t1 = 0;
+		t2 = 0;
+		return;
+	}
+
+	// MAJOR BUG -- FIX IT
 
 }
 

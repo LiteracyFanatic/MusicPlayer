@@ -16,7 +16,8 @@ struct Song
 	const unsigned int *times1;
 	const unsigned int *notes2;
 	const unsigned int *times2;
-	const unsigned int songLength;
+	const unsigned int notes1Length;
+	const unsigned int notes2Length;
 	const char* title;
 	const unsigned int titleLength;
 };
@@ -33,7 +34,7 @@ public:
 	void nextSong();
 	void previousSong();
 	void playSong(const struct Song* song);
-	void playCurrentSong();
+	void run();
 	bool songDone;
 	bool paused;
 	void play();

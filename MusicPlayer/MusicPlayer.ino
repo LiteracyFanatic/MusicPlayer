@@ -33,7 +33,8 @@ const unsigned int castle2Times[] PROGMEM =
 	81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81, 81
 };
 
-const unsigned int castleLength PROGMEM = sizeof(castle1Notes) > sizeof(castle2Notes) ? sizeof(castle1Notes) / sizeof(unsigned int) : sizeof(castle2Notes) / sizeof(unsigned int);
+const unsigned int castleNotes1Length PROGMEM = sizeof(castle1Notes) / sizeof(unsigned int);
+const unsigned int castleNotes2Length PROGMEM = sizeof(castle2Notes) / sizeof(unsigned int);
 
 const struct Song castleSong PROGMEM =
 {
@@ -41,7 +42,8 @@ const struct Song castleSong PROGMEM =
 	castle1Times,
 	castle2Notes,
 	castle2Times,
-	castleLength,
+	castleNotes1Length,
+	castleNotes2Length,
 	nyanCatTitle,
 	nyanCatTitleLength
 };
@@ -70,7 +72,8 @@ const unsigned int mario2Times[] PROGMEM =
 };
 
 
-const unsigned int marioLength PROGMEM = sizeof(mario1Notes) > sizeof(mario2Notes) ? sizeof(mario1Notes) / sizeof(unsigned int) : sizeof(mario2Notes) / sizeof(unsigned int);
+const unsigned int marioNotes1Length PROGMEM = sizeof(mario1Notes) / sizeof(unsigned int);
+const unsigned int marioNotes2Length PROGMEM = sizeof(mario2Notes) / sizeof(unsigned int);
 
 const struct Song marioSong PROGMEM =
 {
@@ -78,7 +81,8 @@ const struct Song marioSong PROGMEM =
 	mario1Times,
 	mario2Notes,
 	mario2Times,
-	marioLength,
+	marioNotes1Length,
+	marioNotes2Length,
 	nyanCatTitle,
 	nyanCatTitleLength
 };
@@ -105,7 +109,8 @@ const unsigned int bachDouble2Times[] PROGMEM =
 	138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 555, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 69, 69, 69, 69, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 1111, 138, 138, 138, 138, 138, 138, 138, 138, 1111, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 1111, 138, 138, 138, 138, 138, 138, 138, 138, 1111, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 555, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 555, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 277, 277, 277, 277, 277, 277, 1111, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 555, 277, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 277, 277, 277, 277, 138, 138, 138, 138, 277, 277, 138, 138, 2222, 2222, 2222, 555, 555, 555, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 555, 277, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 277, 277, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 138, 138, 555, 277, 138, 138, 138, 138, 277, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 555, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 555, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 1111, 138, 138, 138, 138, 138, 138, 138, 138, 1111, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 277, 138, 138, 555, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 1111, 138, 138, 138, 138, 138, 138, 138, 138, 1111, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 138, 138, 555, 277, 138, 138, 138, 138, 277, 277, 138, 138, 555, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 138, 138, 138, 138, 277, 277, 138, 138, 138, 138, 277, 277, 138, 138, 138, 138, 138, 138, 555, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 138, 138, 138, 138, 138, 138, 277, 277, 138, 138, 138, 138, 277, 138, 138, 138, 138, 555, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 2222, 2222, 2222, 555, 555, 555, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 277, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 555, 138, 138, 138, 138, 138, 138, 138, 138, 1111, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 277, 277, 138, 138, 1111
 };
 
-const unsigned int bachDoubleLength PROGMEM = sizeof(bachDouble1Notes) > sizeof(bachDouble2Notes) ? sizeof(bachDouble1Notes) / sizeof(unsigned int) : sizeof(bachDouble2Notes) / sizeof(unsigned int);
+const unsigned int bachDoubleNotes1Length PROGMEM = sizeof(bachDouble1Notes) / sizeof(unsigned int);
+const unsigned int bachDoubleNotes2Length PROGMEM = sizeof(bachDouble2Notes) / sizeof(unsigned int);
 
 const struct Song bachDoubleSong PROGMEM =
 {
@@ -113,7 +118,8 @@ const struct Song bachDoubleSong PROGMEM =
 	bachDouble1Times,
 	bachDouble2Notes,
 	bachDouble2Times,
-	bachDoubleLength,
+	bachDoubleNotes1Length,
+	bachDoubleNotes2Length,
 	nyanCatTitle,
 	nyanCatTitleLength
 };
@@ -131,7 +137,7 @@ const unsigned int bachTimes[] PROGMEM =
 	166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 333, 333, 1000, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 333, 333, 1000
 };
 
-const unsigned int bachLength PROGMEM = sizeof(bachNotes) / sizeof(unsigned int);
+const unsigned int bachNotesLength PROGMEM = sizeof(bachNotes) / sizeof(unsigned int);
 
 const struct Song bachSong PROGMEM =
 {
@@ -139,7 +145,8 @@ const struct Song bachSong PROGMEM =
 	bachTimes,
 	NULL,
 	NULL,
-	bachLength,
+	bachNotesLength,
+	NULL,
 	nyanCatTitle,
 	nyanCatTitleLength
 };
@@ -168,7 +175,8 @@ const unsigned int undertale2Times[] PROGMEM =
 };
 
 
-const unsigned int undertaleLength PROGMEM = sizeof(undertale1Notes) > sizeof(undertale2Notes) ? sizeof(undertale1Notes) / sizeof(unsigned int) : sizeof(undertale2Notes) / sizeof(unsigned int);
+const unsigned int undertaleNotes1Length PROGMEM = sizeof(undertale1Notes) / sizeof(unsigned int);
+const unsigned int undertaleNotes2Length PROGMEM = sizeof(undertale2Notes) / sizeof(unsigned int);
 
 const struct Song undertaleSong PROGMEM =
 {
@@ -176,7 +184,8 @@ const struct Song undertaleSong PROGMEM =
 	undertale1Times,
 	undertale2Notes,
 	undertale2Times,
-	undertaleLength,
+	undertaleNotes1Length,
+	undertaleNotes2Length,
 	nyanCatTitle,
 	nyanCatTitleLength
 };
@@ -184,42 +193,69 @@ const struct Song undertaleSong PROGMEM =
 
 #pragma region Nyan Cat
 // Nyan Cat
-const unsigned int nyanCat1Notes[] PROGMEM =
+const unsigned int nyanCatNotes[] PROGMEM =
 {
 	NOTE_DS6, NOTE_E6, NOTE_FS6, NOTE_REST, NOTE_B6, NOTE_E6, NOTE_DS6, NOTE_E6, NOTE_FS6, NOTE_B6, NOTE_DS7, NOTE_E7, NOTE_DS7, NOTE_AS6, NOTE_B6, NOTE_REST, NOTE_FS6, NOTE_REST, NOTE_DS6, NOTE_E6, NOTE_FS6, NOTE_REST, NOTE_B6, NOTE_CS7, NOTE_AS6, NOTE_B6, NOTE_CS7, NOTE_E7, NOTE_DS7, NOTE_E7, NOTE_CS7, NOTE_FS5, NOTE_GS5, NOTE_C5, NOTE_DS5, NOTE_CS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_B4, NOTE_CS5, NOTE_D5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_FS5, NOTE_GS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_CS5, NOTE_B4, NOTE_DS5, NOTE_FS5, NOTE_GS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_C5, NOTE_DS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_D5, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_FS5, NOTE_GS5, NOTE_C5, NOTE_DS5, NOTE_CS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_B4, NOTE_CS5, NOTE_D5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_FS5, NOTE_GS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_CS5, NOTE_B4, NOTE_DS5, NOTE_FS5, NOTE_GS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_C5, NOTE_DS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_D5, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_B4, NOTE_B4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_E5, NOTE_DS5, NOTE_E5, NOTE_FS5, NOTE_B4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_E5, NOTE_DS5, NOTE_CS5, NOTE_B4, NOTE_E4, NOTE_DS4, NOTE_E4, NOTE_FS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_B4, NOTE_B4, NOTE_AS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_E5, NOTE_DS5, NOTE_E5, NOTE_FS5, NOTE_B4, NOTE_AS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_E5, NOTE_DS5, NOTE_E5, NOTE_FS5, NOTE_B4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_E5, NOTE_DS5, NOTE_CS5, NOTE_B4, NOTE_E4, NOTE_DS4, NOTE_E4, NOTE_FS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_B4, NOTE_B4, NOTE_AS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_E5, NOTE_DS5, NOTE_E5, NOTE_FS5, NOTE_B4, NOTE_CS5, NOTE_B4
 };
 
-const unsigned int nyanCat1Times[] PROGMEM =
+const unsigned int nyanCatTimes[] PROGMEM =
 {
 	107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 107, 214, 107, 107, 107, 214, 214, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 214, 214, 214, 107, 214, 107, 107, 107, 214, 214, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 214, 214, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 214, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 857
 };
 
-const unsigned int nyanCat2Notes[] PROGMEM =
-{
-	NOTE_DS6, NOTE_E6, NOTE_FS6, NOTE_REST, NOTE_B6, NOTE_E6, NOTE_DS6, NOTE_E6, NOTE_FS6, NOTE_B6, NOTE_DS7, NOTE_E7, NOTE_DS7, NOTE_AS6, NOTE_B6, NOTE_REST, NOTE_FS6, NOTE_REST, NOTE_DS6, NOTE_E6, NOTE_FS6, NOTE_REST, NOTE_B6, NOTE_CS7, NOTE_AS6, NOTE_B6, NOTE_CS7, NOTE_E7, NOTE_DS7, NOTE_E7, NOTE_CS7, NOTE_FS5, NOTE_GS5, NOTE_C5, NOTE_DS5, NOTE_CS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_B4, NOTE_CS5, NOTE_D5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_FS5, NOTE_GS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_CS5, NOTE_B4, NOTE_DS5, NOTE_FS5, NOTE_GS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_C5, NOTE_DS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_D5, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_FS5, NOTE_GS5, NOTE_C5, NOTE_DS5, NOTE_CS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_B4, NOTE_CS5, NOTE_D5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_FS5, NOTE_GS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_CS5, NOTE_B4, NOTE_DS5, NOTE_FS5, NOTE_GS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_C5, NOTE_DS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_D5, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_FS5, NOTE_CS5, NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_CS5, NOTE_B4, NOTE_B4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_E5, NOTE_DS5, NOTE_E5, NOTE_FS5, NOTE_B4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_E5, NOTE_DS5, NOTE_CS5, NOTE_B4, NOTE_E4, NOTE_DS4, NOTE_E4, NOTE_FS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_B4, NOTE_B4, NOTE_AS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_E5, NOTE_DS5, NOTE_E5, NOTE_FS5, NOTE_B4, NOTE_AS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_E5, NOTE_DS5, NOTE_E5, NOTE_FS5, NOTE_B4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_E5, NOTE_DS5, NOTE_CS5, NOTE_B4, NOTE_E4, NOTE_DS4, NOTE_E4, NOTE_FS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_B4, NOTE_CS5, NOTE_DS5, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_B4, NOTE_B4, NOTE_AS4, NOTE_B4, NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_E5, NOTE_DS5, NOTE_E5, NOTE_FS5, NOTE_B4, NOTE_CS5, NOTE_B4
-};
-
-const unsigned int nyanCat2Times[] PROGMEM =
-{
-	107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 107, 214, 107, 107, 107, 214, 214, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 214, 214, 214, 107, 214, 107, 107, 107, 214, 214, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 214, 214, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 214, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 214, 214, 857
-};
-
-const unsigned int nyanCatLength PROGMEM = sizeof(nyanCat1Notes) / sizeof(unsigned int);
+const unsigned int nyanCatNotesLength PROGMEM = sizeof(nyanCatNotes) / sizeof(unsigned int);
 
 const struct Song nyanCatSong PROGMEM =
 {
-	nyanCat1Notes,
-	nyanCat1Times,
+	nyanCatNotes,
+	nyanCatTimes,
 	NULL,
 	NULL,
-	nyanCatLength,
+	nyanCatNotesLength,
+	NULL,
 	nyanCatTitle,
 	nyanCatTitleLength
 };
 #pragma endregion
 
+const unsigned int testNotes1[] PROGMEM =
+{
+	NOTE_A4
+};
+
+const unsigned int testTimes1[] PROGMEM =
+{
+	2000
+};
+
+const unsigned int testNotes2[] PROGMEM =
+{
+	NOTE_D4, NOTE_E5, NOTE_FS4, NOTE_G5
+};
+
+const unsigned int testTimes2[] PROGMEM =
+{
+	500, 100, 100, 500
+};
+
+const unsigned int testNotes1Length PROGMEM = sizeof(testNotes1) / sizeof(unsigned int);
+const unsigned int testNotes2Length PROGMEM = sizeof(testNotes2) / sizeof(unsigned int);
+
+const struct Song testSong PROGMEM =
+{
+	testNotes1,
+	testTimes1,
+	testNotes2,
+	testTimes2,
+	testNotes1Length,
+	testNotes2Length,
+	NULL,
+	NULL
+};
+
 const struct Song* songList[] =
 {
+	&testSong,
 	&castleSong,
 	&marioSong,
 	&bachDoubleSong,
@@ -295,7 +331,6 @@ Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 int cx;
 int cy;
 int buttonSize = 50;
-char label[] = ">";
 
 Adafruit_GFX_Button playPauseButton;
 Adafruit_GFX_Button nextButton;
@@ -312,8 +347,9 @@ MusicPlayer mp = MusicPlayer(songList, sizeof(songList) / sizeof(unsigned int));
 #define TONE_1_PIN 22
 #define TONE_2_PIN 24
 
-const char* titles[6] =
+const char* titles[7] =
 {
+	"Test Song",
 	"Mario Castle",
 	"Mario Tune",
 	"Bach Double",
@@ -355,18 +391,9 @@ void setup()
 	cx = tft.width() / 2;
 	cy = tft.height() / 2;
 
-	//  for (int i = 0; i < tft.width(); i += 5) {
-	//    if (i % 2) {
-	//      tft.drawFastVLine(i, 0, tft.height(), GRAY);
-	//    } else {
-	//      tft.drawFastVLine(i, 0, tft.height(), BLUE);
-	//    }
-	//  }
-
 	tft.fillTriangle(cx - buttonSize / 2, cy - buttonSize / 2, cx + buttonSize / 2, cy, cx - buttonSize / 2, cy + buttonSize / 2, WHITE);
 
 	playPauseButton.initButton(&tft, cx, cy, buttonSize, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
-	//playPauseButton.drawButton(false);
 
 	nextButtonX = tft.width() - (buttonSize * 2) - 2;
 	nextButtonY = cy - buttonSize / 2;
@@ -377,9 +404,8 @@ void setup()
 	previousButtonW = drawPreviousButton(previousButtonX, previousButtonY, buttonSize, WHITE);
 
 	nextButton.initButton(&tft, nextButtonX + nextButtonW / 2, nextButtonY + buttonSize / 2, nextButtonW, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
-	//nextButton.drawButton(false);
+
 	previousButton.initButton(&tft, previousButtonX + previousButtonW / 2, previousButtonY + buttonSize / 2, previousButtonW, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
-	//previousButton.drawButton(false);
 
 	/*Serial.print("sizeof(int) = "); Serial.println(sizeof(int));
 	Serial.print("sizeof(int*) = "); Serial.println(sizeof(int*));
@@ -400,25 +426,22 @@ void setup()
 #define MINPRESSURE 10
 #define MAXPRESSURE 1000
 
-//bool paused = true;
-
-
-
 void loop()
 {
 	updateScreen();
 
-	mp.playCurrentSong();
+	mp.run();
 	if (mp.songDone)
 	{
-		//mp.playNextSong();
-		mp.currentSong(mp.currentSong() + 1);
+		mp.nextSong();
 		mp.songDone = false;
-		
+
+		// LAZY -- DO THIS BETTER LATER
+
+		delay(1500);
+
+		// LAZY -- DO THIS BETTER LATER
 	}
-	//mp.currentSong(mp.currentSong() + 1);
-
-
 }
 
 
@@ -433,22 +456,20 @@ void drawPauseButton(unsigned int color) {
 
 int drawNextButton(int x, int y, int h, unsigned int color) {
 	int w = (h * 2) - 18;
-	//  tft.drawRect(x, y, w, h, RED);
 	tft.fillTriangle(x, y, x + h, y + h / 2, x, y + h, color);
-	x += (h)-20;
+	x += h - 20;
 	tft.fillTriangle(x, y, x + h, y + h / 2, x, y + h, color);
-	x += (h)-5;
+	x += h -5;
 	tft.fillRect(x, y, 7, h, color);
 	return w;
 }
 
 int drawPreviousButton(int x, int y, int h, unsigned int color) {
 	int w = (h * 2) - 18;
-	//  tft.drawRect(x, y, w, h, RED);
 	tft.fillRect(x, y, 7, h, color);
 	x += 2;
 	tft.fillTriangle(x, y + h / 2, x + h, y, x + h, y + h, color);
-	x += (h)-20;
+	x += h - 20;
 	tft.fillTriangle(x, y + h / 2, x + h, y, x + h, y + h, color);
 	return w;
 }
@@ -457,11 +478,6 @@ void displayTitle() {
 	tft.fillRect(0, 0, tft.width(), 40, BLACK);
 	tft.setCursor(10, 10);	
 	tft.setTextSize(3);
-
-	//tft.setTextColor(BLACK);
-	//tft.print(titles[mp.currentSong() - 1]);
-
-	//tft.setCursor(10, 10);
 
 	tft.setTextColor(WHITE);
 	tft.print(titles[mp.currentSong()]);
@@ -487,29 +503,18 @@ void updateScreen() {
 	pinMode(YP, OUTPUT);
 	//pinMode(YM, OUTPUT);
 
-	//Serial.print("p.x = "); Serial.println(p.x);
-	//Serial.print("p.y = "); Serial.println(p.y);
 
 	if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
-		// scale from 0->1023 to tft.width
 		int tempPY = p.y;
 		p.y = (map(p.x, TS_MINX, TS_MAXX, 0, tft.height()));
 		p.x = (map(tempPY, TS_MINY, TS_MAXY, 0, tft.width()));
 	}
 
-	//  tft.fillCircle(p.x, p.y, 3, WHITE);
-	//
-	//  tft.fillRect(0, 0, 300, 25, BLACK);
-	//  tft.setCursor(0, 0);
-	//  tft.setTextColor(WHITE);  tft.setTextSize(2);
-	//  tft.print("X: "); tft.print(p.x); tft.print(" Y: "); tft.print(p.y); tft.print(" Z: "); tft.print(p.z);
-
 	if (nextButton.contains(p.x, p.y)) {
-		//Serial.print("Pressing: "); Serial.println("nextButton");
-		nextButton.press(true);  // tell the button it is pressed
+		nextButton.press(true);
 	}
 	else {
-		nextButton.press(false);  // tell the button it is NOT pressed
+		nextButton.press(false);
 	}
 
 	if (nextButton.justPressed()) {
@@ -525,11 +530,11 @@ void updateScreen() {
 	}
 
 	if (previousButton.contains(p.x, p.y)) {
-		//Serial.print("Pressing: "); Serial.println(b);
-		previousButton.press(true);  // tell the button it is pressed
+
+		previousButton.press(true);
 	}
 	else {
-		previousButton.press(false);  // tell the button it is NOT pressed
+		previousButton.press(false);
 	}
 
 	if (previousButton.justPressed()) {
@@ -545,11 +550,11 @@ void updateScreen() {
 	}
 
 	if (playPauseButton.contains(p.x, p.y)) {
-		//Serial.print("Pressing: "); Serial.println(b);
-		playPauseButton.press(true);  // tell the button it is pressed
+
+		playPauseButton.press(true);
 	}
 	else {
-		playPauseButton.press(false);  // tell the button it is NOT pressed
+		playPauseButton.press(false);
 	}
 
 	if (playPauseButton.justPressed()) {
@@ -563,8 +568,6 @@ void updateScreen() {
 	}
 
 	if (playPauseButton.justReleased()) {
-		//playPauseButton.drawButton();
-		//playPauseButton.drawButton(true);
 
 		if (mp.paused) {
 			mp.play();
