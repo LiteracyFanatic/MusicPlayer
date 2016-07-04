@@ -10,6 +10,9 @@
 	#include "WProgram.h"
 #endif
 
+
+#define dv(v) Serial.print(#v); Serial.print(" = "); Serial.println(v);
+
 struct Song
 {
 	const unsigned int *notes1;
@@ -40,6 +43,10 @@ public:
 	void play();
 	void pause();
 	const char* title();
+	float percentComplete();
+	unsigned long currentSongDuration;
+	unsigned long calculateElapsedTime();
+
 
 private:
 	Tone tone1;
@@ -50,6 +57,8 @@ private:
 	unsigned long t2;
 	unsigned long dt;
 	unsigned long pausedTime;
+	void calculateDuration(const struct Song* song);
+
 	int note1Index;
 	int note2Index;
 };

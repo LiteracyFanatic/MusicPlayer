@@ -2,7 +2,7 @@
 #include "Song.h"
 
 #define dv(v) Serial.print(#v); Serial.print(" = "); Serial.println(v);
-	
+
 
 MusicPlayer::MusicPlayer(const struct Song* *sl, byte n)
 {
@@ -19,6 +19,7 @@ MusicPlayer::MusicPlayer(const struct Song* *sl, byte n)
 	paused = true;
 	pausedTime = 0;
 	dt = 0;
+	calculateDuration(songList[curSong]);
 }
 
 void MusicPlayer::start(byte t1, byte t2)
@@ -37,6 +38,7 @@ void MusicPlayer::currentSong(byte cs)
 	note2Index = 0;
 	songDone = false;
 	pausedTime = 0;
+	calculateDuration(songList[curSong]);
 }
 
 byte MusicPlayer::currentSong()
@@ -93,17 +95,62 @@ const char* MusicPlayer::title()
 
 	for (int i = 0; i < len; i++)
 	{
-	strcpy_P(buffer, (char*)pgm_read_word(&(songList[curSong])->title));
+		strcpy_P(buffer, (char*)pgm_read_word(&(songList[curSong])->title));
 	}
-
 
 	//Serial.println(buffer);
 
 	return buffer;
 }
 
+float MusicPlayer::percentComplete()
+{
+	return (float) calculateElapsedTime() / currentSongDuration;
+}
 
-void  MusicPlayer::playSong(const struct Song* song)
+void MusicPlayer::calculateDuration(const Song * song)
+{
+	int noteLen1 = pgm_read_word(&(song->notes1Length));
+	int noteLen2 = pgm_read_word(&(song->notes2Length));
+
+	unsigned long d1 = 0;
+	unsigned long d2 = 0;
+
+	for (int i = 0; i < noteLen1; i++)
+	{
+		d1 += pgm_read_word(pgm_read_word(&(song->times1)) + i * sizeof(unsigned int));
+	}
+
+	for (int j = 0; j < noteLen1; j++)
+	{
+		d2 += pgm_read_word(pgm_read_word(&(song->times2)) + j * sizeof(unsigned int));
+	}
+
+	currentSongDuration = max(d1, d2);
+}
+
+unsigned long MusicPlayer::calculateElapsedTime()
+{
+	const Song * song = songList[curSong];
+
+	unsigned long d1 = 0;
+	unsigned long d2 = 0;
+
+	for (int i = 0; i < note1Index; i++)
+	{
+		d1 += pgm_read_word(pgm_read_word(&(song->times1)) + i * sizeof(unsigned int));
+	}
+
+	for (int j = 0; j < note2Index; j++)
+	{
+		d2 += pgm_read_word(pgm_read_word(&(song->times2)) + j * sizeof(unsigned int));
+	}
+
+	return max(d1, d2);
+}
+
+
+void MusicPlayer::playSong(const struct Song* song)
 {
 	if (songDone)
 	{
@@ -158,7 +205,7 @@ void  MusicPlayer::playSong(const struct Song* song)
 		note1Index++;
 		//Serial.print("curNote1 = "); Serial.println(curNote1);
 		//Serial.print("curTime1 = "); Serial.println(curTime1);
-		t1 += (long) curTime1;
+		t1 += (long)curTime1;
 		tone1.play(curNote1, curTime1);
 	}
 
@@ -169,11 +216,11 @@ void  MusicPlayer::playSong(const struct Song* song)
 
 		curNote2 = pgm_read_word(pgm_read_word(&(song->notes2)) + note2Index * sizeof(unsigned int));
 		curTime2 = pgm_read_word(pgm_read_word(&(song->times2)) + note2Index * sizeof(unsigned int));
-		
+
 		note2Index++;
 		//Serial.print("curNote2 = "); Serial.println(curNote2);
 		//Serial.print("curTime2 = "); Serial.println(curTime2);
-		t2 += (long) curTime2;
+		t2 += (long)curTime2;
 		tone2.play(curNote2, curTime2);
 	}
 

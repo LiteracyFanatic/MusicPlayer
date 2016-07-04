@@ -425,6 +425,8 @@ void setup()
 	mp.currentSong(0);
 
 	displayTitle();
+	drawProgressBar(10, tft.width() - 10, 200, 10, 0, WHITE, true);
+
 }
 
 #define MINPRESSURE 10
@@ -437,6 +439,7 @@ void loop()
 	updateScreen();
 
 	mp.run();
+
 
 	if (mp.songDone)
 	{
@@ -458,16 +461,19 @@ void loop()
 }
 
 
-void drawPlayButton(unsigned int color) {
+void drawPlayButton(unsigned int color)
+{
 	tft.fillTriangle(cx - buttonSize / 2, cy - buttonSize / 2, cx + buttonSize / 2, cy, cx - buttonSize / 2, cy + buttonSize / 2, color);
 }
 
-void drawPauseButton(unsigned int color) {
+void drawPauseButton(unsigned int color)
+{
 	tft.fillRect(cx - buttonSize / 2, cy - buttonSize / 2, 15, buttonSize, color);
 	tft.fillRect(cx + (buttonSize / 2) - 15, cy - buttonSize / 2, 15, buttonSize, color);
 }
 
-int drawNextButton(int x, int y, int h, unsigned int color) {
+int drawNextButton(int x, int y, int h, unsigned int color)
+{
 	int w = (h * 2) - 18;
 	tft.fillTriangle(x, y, x + h, y + h / 2, x, y + h, color);
 	x += h - 20;
@@ -477,7 +483,8 @@ int drawNextButton(int x, int y, int h, unsigned int color) {
 	return w;
 }
 
-int drawPreviousButton(int x, int y, int h, unsigned int color) {
+int drawPreviousButton(int x, int y, int h, unsigned int color)
+{
 	int w = (h * 2) - 18;
 	tft.fillRect(x, y, 7, h, color);
 	x += 2;
@@ -519,11 +526,22 @@ void drawArduinoLogo(unsigned int color)
 	{
 		delay(50);
 		tft.print(text[i]);
-
 	}
 }
 
-void displayTitle() {
+void drawProgressBar(int x1, int x2, int y, int h, float p, unsigned int color, bool refresh)
+{
+	if (refresh)
+	{
+		tft.fillRoundRect(x1, y - h / 2, x2 - x1, h, h / 2, GRAY);
+	}
+	int progressWidth = (int)mapFloat(p, 0, 1, x1, x2);
+	progressWidth = constrain(progressWidth, 0, x2 - x1);
+	tft.fillRoundRect(x1 + 2, y - (h / 2) + 2, progressWidth - 4, h - 4, (h - 4) / 2, color);
+}
+
+void displayTitle()
+{
 	tft.fillRect(0, 0, tft.width(), 40, BLACK);
 	tft.setCursor(10, 10);
 	tft.setTextSize(3);
@@ -541,7 +559,10 @@ void displayTitle() {
 
 byte prevSong = 0;
 
-void updateScreen() {
+float prog = 0;
+
+void updateScreen()
+{
 	digitalWrite(13, HIGH);
 	TSPoint p = ts.getPoint();
 	digitalWrite(13, LOW);
@@ -553,24 +574,29 @@ void updateScreen() {
 	//pinMode(YM, OUTPUT);
 
 
-	if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+	if (p.z > MINPRESSURE && p.z < MAXPRESSURE)
+	{
 		int tempPY = p.y;
 		p.y = (map(p.x, TS_MINX, TS_MAXX, 0, tft.height()));
 		p.x = (map(tempPY, TS_MINY, TS_MAXY, 0, tft.width()));
 	}
 
-	if (nextButton.contains(p.x, p.y)) {
+	if (nextButton.contains(p.x, p.y))
+	{
 		nextButton.press(true);
 	}
-	else {
+	else
+	{
 		nextButton.press(false);
 	}
 
-	if (nextButton.justPressed()) {
+	if (nextButton.justPressed())
+	{
 		drawNextButton(nextButtonX, nextButtonY, buttonSize, GRAY);
 	}
 
-	if (nextButton.justReleased()) {
+	if (nextButton.justReleased())
+	{
 		drawNextButton(nextButtonX, nextButtonY, buttonSize, WHITE);
 		drawPlayButton(BLACK);
 		drawPauseButton(WHITE);
@@ -578,11 +604,12 @@ void updateScreen() {
 		mp.play();
 	}
 
-	if (previousButton.contains(p.x, p.y)) {
-
+	if (previousButton.contains(p.x, p.y))
+	{
 		previousButton.press(true);
 	}
-	else {
+	else
+	{
 		previousButton.press(false);
 	}
 
@@ -590,7 +617,8 @@ void updateScreen() {
 		drawPreviousButton(previousButtonX, previousButtonY, buttonSize, GRAY);
 	}
 
-	if (previousButton.justReleased()) {
+	if (previousButton.justReleased())
+	{
 		drawPreviousButton(previousButtonX, previousButtonY, buttonSize, WHITE);
 		drawPlayButton(BLACK);
 		drawPauseButton(WHITE);
@@ -598,35 +626,43 @@ void updateScreen() {
 		mp.play();
 	}
 
-	if (playPauseButton.contains(p.x, p.y)) {
-
+	if (playPauseButton.contains(p.x, p.y))
+	{
 		playPauseButton.press(true);
 	}
-	else {
+	else
+	{
 		playPauseButton.press(false);
 	}
 
-	if (playPauseButton.justPressed()) {
-		if (mp.paused) {
+	if (playPauseButton.justPressed())
+	{
+		if (mp.paused)
+		{
 			drawPlayButton(GRAY);
 		}
-		else {
+		else
+		{
 			drawPlayButton(BLACK);
 			drawPauseButton(GRAY);
 		}
 	}
 
-	if (playPauseButton.justReleased()) {
+	if (playPauseButton.justReleased())
+	{
 
-		if (mp.paused) {
+		if (mp.paused)
+		{
 			mp.play();
 			drawPlayButton(BLACK);
 			drawPauseButton(WHITE);
 		}
-		else {
+		else
+		{
 			mp.pause();
 			drawPauseButton(BLACK);
 			drawPlayButton(WHITE);
+			dv(mp.percentComplete());
 		}
 	}
 
@@ -636,9 +672,25 @@ void updateScreen() {
 		prevSong = mp.currentSong();
 	}
 
+	if (mp.percentComplete() - prog > .01)
+	{
+		
+	}
+	if (prog > mp.percentComplete())
+	{
+		prog = 0;
+		drawProgressBar(10, tft.width() - 10, 200, 10, prog, WHITE, true);
+	}
+	else
+	{
+		prog = mp.percentComplete();
+		drawProgressBar(10, tft.width() - 10, 200, 10, prog, WHITE, false);
+	}
+
 }
 
-void waitForTap() {
+void waitForTap()
+{
 	bool done = false;
 	while (!done)
 	{
@@ -652,14 +704,15 @@ void waitForTap() {
 		pinMode(YP, OUTPUT);
 		//pinMode(YM, OUTPUT);
 
-		if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+		if (p.z > MINPRESSURE && p.z < MAXPRESSURE)
+		{
 			done = true;
 		}
 	}
 
 }
 
-void waitForTap(unsigned long waitTime) 
+void waitForTap(unsigned long waitTime)
 {
 	bool done = false;
 	unsigned long ti = millis();
@@ -675,7 +728,8 @@ void waitForTap(unsigned long waitTime)
 		pinMode(YP, OUTPUT);
 		//pinMode(YM, OUTPUT);
 
-		if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+		if (p.z > MINPRESSURE && p.z < MAXPRESSURE)
+		{
 			done = true;
 		}
 
@@ -687,7 +741,12 @@ void waitForTap(unsigned long waitTime)
 			}
 		}
 	}
+}
 
+
+float mapFloat(double x, double in_min, double in_max, double out_min, double out_max)
+{
+	return (int)((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
 }
 
 
