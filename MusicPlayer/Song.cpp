@@ -22,7 +22,7 @@ MusicPlayer::MusicPlayer(const struct Song* *sl, byte n)
 	calculateDuration(songList[curSong]);
 }
 
-void MusicPlayer::start(byte t1, byte t2)
+void MusicPlayer::init(byte t1, byte t2)
 {
 	tone1.begin(t1);
 	tone2.begin(t2);
@@ -121,7 +121,7 @@ void MusicPlayer::calculateDuration(const Song * song)
 		d1 += pgm_read_word(pgm_read_word(&(song->times1)) + i * sizeof(unsigned int));
 	}
 
-	for (int j = 0; j < noteLen1; j++)
+	for (int j = 0; j < noteLen2; j++)
 	{
 		d2 += pgm_read_word(pgm_read_word(&(song->times2)) + j * sizeof(unsigned int));
 	}

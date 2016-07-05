@@ -29,7 +29,7 @@ class MusicPlayer
 {
 public:
 	MusicPlayer(const struct Song* *sl, byte n);
-	void start(byte t1, byte t2);
+	void init(byte t1, byte t2);
 	byte numberOfSongs;
 	const struct Song* *songList;
 	void currentSong(byte cs);

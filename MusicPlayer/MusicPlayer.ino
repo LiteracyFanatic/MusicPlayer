@@ -2,7 +2,8 @@
 #include <gfxfont.h>
 #include "Song.h"
 #include <Fonts/FreeMonoBoldOblique12pt7b.h>
-#include <Fonts/FreeSerif9pt7b.h>
+#include <Fonts/FreeSerif9pt7b.h>
+
 
 const byte speakerPin = 9;
 const byte switchAPin = 2;
@@ -260,6 +261,12 @@ const struct Song* songList[] =
 	&bachDoubleSong,
 	&bachSong,
 	&nyanCatSong,
+	&undertaleSong,
+	&castleSong,
+	&marioSong,
+	&bachDoubleSong,
+	&bachSong,
+	&nyanCatSong,
 	&undertaleSong
 };
 
@@ -334,6 +341,7 @@ int buttonSize = 50;
 Adafruit_GFX_Button playPauseButton;
 Adafruit_GFX_Button nextButton;
 Adafruit_GFX_Button previousButton;
+Adafruit_GFX_Button listButton;
 
 int nextButtonX;
 int nextButtonY;
@@ -346,15 +354,29 @@ MusicPlayer mp = MusicPlayer(songList, sizeof(songList) / sizeof(unsigned int));
 #define TONE_1_PIN 22
 #define TONE_2_PIN 24
 
-const char* titles[7] =
+char* titles[12] =
 {
 	"Mario Castle",
 	"Mario Tune",
 	"Bach Double",
 	"Random Bach",
 	"Nyan Cat",
-	"Bonetrousle"
+	"Bonetrousle",
+	"dfdf",
+	"asdfasd adf",
+	" asfasfasdf df",
+	"asdf sdf",
+	"Nydfan Cfdat",
+	"Bonasdfusle"
 };
+
+Adafruit_GFX_Button songButtons[5];
+Adafruit_GFX_Button upButton;
+Adafruit_GFX_Button downButton;
+Adafruit_GFX_Button cdButton;
+
+byte curPage = 0;
+byte numberOfPages;
 
 void setup()
 {
@@ -389,44 +411,18 @@ void setup()
 
 	tft.fillScreen(BLACK);
 
+	tft.fillScreen(BLACK);
+
 	drawArduinoLogo(BLUE);
 
 	waitForTap(5000);
 
-	tft.fillScreen(BLACK);
+	numberOfPages = ceil((float)mp.numberOfSongs / 5);
 
-	tft.fillTriangle(cx - buttonSize / 2, cy - buttonSize / 2, cx + buttonSize / 2, cy, cx - buttonSize / 2, cy + buttonSize / 2, WHITE);
-
-	playPauseButton.initButton(&tft, cx, cy, buttonSize, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
-
-	nextButtonX = tft.width() - (buttonSize * 2) - 2;
-	nextButtonY = cy - buttonSize / 2;
-	previousButtonX = 20;
-	previousButtonY = cy - buttonSize / 2;
-
-	nextButtonW = drawNextButton(nextButtonX, nextButtonY, buttonSize, WHITE);
-	previousButtonW = drawPreviousButton(previousButtonX, previousButtonY, buttonSize, WHITE);
-
-	nextButton.initButton(&tft, nextButtonX + nextButtonW / 2, nextButtonY + buttonSize / 2, nextButtonW, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
-
-	previousButton.initButton(&tft, previousButtonX + previousButtonW / 2, previousButtonY + buttonSize / 2, previousButtonW, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
-
-	/*Serial.print("sizeof(int) = "); Serial.println(sizeof(int));
-	Serial.print("sizeof(int*) = "); Serial.println(sizeof(int*));
-	Serial.print("eagleLength = "); Serial.println(pgm_read_word(&(songList[0]->songLength)));
-	Serial.print("bachLength = "); Serial.println(pgm_read_word(&(songList[1]->songLength)));
-	Serial.print("nyanCatLength = "); Serial.println(pgm_read_word(&(songList[0]->songLength)));
-	Serial.print("undertaleLength = "); Serial.println(pgm_read_word(&(songList[0]->songLength)));
-	Serial.print("bachLength = "); Serial.println(bachLength);
-	Serial.print("nyanCatLength = "); Serial.println(nyanCatLength);
-	Serial.print("undertaleLength = "); Serial.println(undertaleLength);*/
-
-	mp.start(22, 24);
+	mp.init(22, 24);
 	mp.currentSong(0);
 
-	displayTitle();
-	drawProgressBar(10, tft.width() - 10, 200, 10, 0, WHITE, true);
-
+	initPlayerScreen();
 }
 
 #define MINPRESSURE 10
@@ -434,12 +430,29 @@ void setup()
 
 unsigned long t = 0;
 
+enum Screen
+{
+	PLAYER,
+	SONGLIST
+};
+
+enum Screen currentScreen = PLAYER;
+
 void loop()
 {
-	updateScreen();
+	switch (currentScreen)
+	{
+	case PLAYER:
+		updatePlayerScreen();
+		break;
+	case SONGLIST:
+		updateSongListScreen();
+		break;
+	default:
+		break;
+	}
 
 	mp.run();
-
 
 	if (mp.songDone)
 	{
@@ -458,15 +471,248 @@ void loop()
 		t = 0;
 	}
 
+	delay(10);
 }
 
 
-void drawPlayButton(unsigned int color)
+void drawCD(int cx, int cy, int r, unsigned int color, bool pressed)
+{
+	if (pressed)
+	{
+		tft.fillCircle(cx, cy, r, GRAY);
+		tft.drawCircle(cx, cy, r, color);
+		tft.fillCircle(cx, cy, r / 2, color);
+		tft.fillCircle(cx, cy, r / 5, BLACK);
+	}
+	else
+	{
+		tft.fillCircle(cx, cy, r, color);
+		tft.drawCircle(cx, cy, r, GRAY);
+		tft.fillCircle(cx, cy, r / 2, GRAY);
+		tft.fillCircle(cx, cy, r / 5, BLACK);
+	}
+}
+
+void initSongListScreen(byte page)
+{
+	tft.fillScreen(BLACK);
+	int margin = 10;
+
+	int w = tft.width() - 2 * margin;
+	int h = tft.height() - 2 * margin;
+
+	int buttonHeight = (h - margin * 4) / 5;
+	int buttonWidth = w * ((float)2 / 3);
+	int buttonCenterx = margin + buttonWidth / 2;
+
+	int tSide = 50;
+	int tcx = margin + w * ((float)5 / 6);
+	int tcy1 = (tft.height() / 2) - 70;
+	int tcy2 = (tft.height() / 2) + 70;
+
+	for (byte i = 0; i < 5; i++)
+	{
+		songButtons[i].initButton(&tft, buttonCenterx, margin + (buttonHeight / 2) + i * (margin + buttonHeight), buttonWidth, buttonHeight, WHITE, WHITE, BLACK, titles[i + 5 * page], 2);
+	}
+
+	for (byte i = 0; i < 5; i++)
+	{
+		if (5 * page + i < mp.numberOfSongs)
+		{
+			songButtons[i].drawButton();
+		}
+	}
+
+	upButton.initButton(&tft, tcx, tcy1, tSide, tSide * cos(radians(30)), WHITE, BLUE, WHITE, NULL, 0);
+	downButton.initButton(&tft, tcx, tcy2, tSide, tSide * cos(radians(30)), WHITE, BLUE, WHITE, NULL, 0);
+
+	if (page < numberOfPages - 1)
+	{
+		drawDownButton(tcx, tcy2, tSide, WHITE);
+	}
+
+	if (page > 0)
+	{
+		drawUpButton(tcx, tcy1, tSide, WHITE);
+	}
+
+	cdButton.initButton(&tft, tcx, cy, 60, 60, WHITE, BLUE, WHITE, NULL, 0);
+	drawCD(tcx, cy, 30, WHITE, false);
+
+}
+
+void updateSongListScreen()
+{
+	int margin = 10;
+
+	int w = tft.width() - 2 * margin;
+	int h = tft.height() - 2 * margin;
+
+	int buttonHeight = (h - margin * 4) / 5;
+	int buttonWidth = w * ((float)2 / 3);
+	int buttonCenterx = margin + buttonWidth / 2;
+
+	int tSide = 50;
+	int tcx = margin + w * ((float)5 / 6);
+	int tcy1 = (tft.height() / 2) - 70;
+	int tcy2 = (tft.height() / 2) + 70;
+
+	digitalWrite(13, HIGH);
+	TSPoint p = ts.getPoint();
+	digitalWrite(13, LOW);
+
+	// if sharing pins, you'll need to fix the directions of the touchscreen pins
+	//pinMode(XP, OUTPUT);
+	pinMode(XM, OUTPUT);
+	pinMode(YP, OUTPUT);
+	//pinMode(YM, OUTPUT);
+
+
+	if (p.z > MINPRESSURE && p.z < MAXPRESSURE)
+	{
+		int tempPY = p.y;
+		p.y = (map(p.x, TS_MINX, TS_MAXX, 0, tft.height()));
+		p.x = (map(tempPY, TS_MINY, TS_MAXY, 0, tft.width()));
+	}
+	else
+	{
+		p.x = 0;
+		p.y = 0;
+	}
+
+	for (byte i = 0; i < 5; i++)
+	{
+		if (5 * curPage + i < mp.numberOfSongs)
+		{
+			if (songButtons[i].contains(p.x, p.y))
+			{
+				songButtons[i].press(true);
+			}
+			else
+			{
+				songButtons[i].press(false);
+			}
+		}
+	}
+
+	for (byte i = 0; i < 5; i++)
+	{
+		if (songButtons[i].justPressed())
+		{
+			songButtons[i].drawButton(true);
+		}
+
+		if (songButtons[i].justReleased())
+		{
+			songButtons[i].drawButton();
+
+			mp.currentSong((curPage * 5) + i);
+
+			mp.play();
+			initPlayerScreen();
+			currentScreen = PLAYER;
+			return;
+		}
+	}
+
+	if (curPage > 0)
+	{
+		if (upButton.contains(p.x, p.y))
+		{
+
+			upButton.press(true);
+		}
+		else
+		{
+			upButton.press(false);
+		}
+
+		if (upButton.justPressed())
+		{
+			drawUpButton(tcx, tcy1, tSide, GRAY);
+		}
+
+		if (upButton.justReleased())
+		{
+			if (curPage > 0)
+			{
+				initSongListScreen(--curPage);
+			}
+		}
+	}
+
+	if (curPage < numberOfPages - 1)
+	{
+		if (downButton.contains(p.x, p.y))
+		{
+			downButton.press(true);
+		}
+		else
+		{
+			downButton.press(false);
+		}
+
+		if (downButton.justPressed())
+		{
+			drawDownButton(tcx, tcy2, tSide, GRAY);
+		}
+
+		if (downButton.justReleased())
+		{
+			if (curPage < numberOfPages - 1)
+			{
+				initSongListScreen(++curPage);
+			}
+		}
+	}
+
+	if (cdButton.contains(p.x, p.y))
+	{
+		cdButton.press(true);
+	}
+	else
+	{
+		cdButton.press(false);
+	}
+
+	if (cdButton.justPressed())
+	{
+		drawCD(tcx, cy, 30, WHITE, true);
+	}
+
+	if (cdButton.justReleased())
+	{
+		drawCD(tcx, cy, 30, WHITE, false);
+		initPlayerScreen();
+		currentScreen = PLAYER;
+		return;
+	}
+}
+
+void displaySongs()
+{
+
+}
+
+void drawUpButton(int cx, int cy, int ts, unsigned int color)
+{
+	int th = ts * cos(radians(30));
+	tft.fillTriangle(cx - ts / 2, cy + th / 2, cx + ts / 2, cy + th / 2, cx, cy - th / 2, color);
+}
+
+void drawDownButton(int cx, int cy, int ts, unsigned int color)
+{
+	int th = ts * cos(radians(30));
+	tft.fillTriangle(cx - ts / 2, cy - th / 2, cx + ts / 2, cy - th / 2, cx, cy + th / 2, color);
+}
+
+
+void drawPlayButton(int cx, int cy, unsigned int color)
 {
 	tft.fillTriangle(cx - buttonSize / 2, cy - buttonSize / 2, cx + buttonSize / 2, cy, cx - buttonSize / 2, cy + buttonSize / 2, color);
 }
 
-void drawPauseButton(unsigned int color)
+void drawPauseButton(int cx, int cy, unsigned int color)
 {
 	tft.fillRect(cx - buttonSize / 2, cy - buttonSize / 2, 15, buttonSize, color);
 	tft.fillRect(cx + (buttonSize / 2) - 15, cy - buttonSize / 2, 15, buttonSize, color);
@@ -561,7 +807,52 @@ byte prevSong = 0;
 
 float prog = 0;
 
-void updateScreen()
+
+void initPlayerScreen()
+{
+	tft.fillScreen(BLACK);
+
+	if (mp.paused)
+	{
+		drawPlayButton(cx, cy - 20, WHITE);
+	}
+	else
+	{
+		drawPauseButton(cx, cy - 20, WHITE);
+	}
+
+	playPauseButton.initButton(&tft, cx, cy - 20, buttonSize, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
+
+	nextButtonX = tft.width() - (buttonSize * 2) - 2;
+	nextButtonY = cy - (buttonSize / 2) - 20;
+	previousButtonX = 20;
+	previousButtonY = cy - (buttonSize / 2) - 20;
+
+	nextButtonW = drawNextButton(nextButtonX, nextButtonY, buttonSize, WHITE);
+	previousButtonW = drawPreviousButton(previousButtonX, previousButtonY, buttonSize, WHITE);
+
+	nextButton.initButton(&tft, nextButtonX + nextButtonW / 2, nextButtonY + buttonSize / 2, nextButtonW, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
+
+	previousButton.initButton(&tft, previousButtonX + previousButtonW / 2, previousButtonY + buttonSize / 2, previousButtonW, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
+
+	displayTitle();
+	drawProgressBar(10, tft.width() - 10, 155, 10, prog, WHITE, true);
+
+	listButton.initButton(&tft, cx, tft.height() - 30, 60, 40, WHITE, BLACK, WHITE, NULL, 0);
+	drawListButton(cx, tft.height() - 40, 60, 40, WHITE);
+}
+
+void drawListButton(int cx, int cy, int w, int h, unsigned int color)
+{
+	int margin = 5;
+	int rh = (h - margin * 2) / 3;
+	for (byte i = 0; i < 3; i++)
+	{
+		tft.fillRoundRect(cx - w / 2, (cy - h / 2) + i * (margin + rh), w, rh, 2, color);
+	}
+}
+
+void updatePlayerScreen()
 {
 	digitalWrite(13, HIGH);
 	TSPoint p = ts.getPoint();
@@ -598,8 +889,11 @@ void updateScreen()
 	if (nextButton.justReleased())
 	{
 		drawNextButton(nextButtonX, nextButtonY, buttonSize, WHITE);
-		drawPlayButton(BLACK);
-		drawPauseButton(WHITE);
+		if (mp.paused)
+		{
+			drawPlayButton(cx, cy - 20, BLACK);
+		}
+		drawPauseButton(cx, cy - 20, WHITE);
 		mp.nextSong();
 		mp.play();
 	}
@@ -613,15 +907,19 @@ void updateScreen()
 		previousButton.press(false);
 	}
 
-	if (previousButton.justPressed()) {
+	if (previousButton.justPressed())
+	{
 		drawPreviousButton(previousButtonX, previousButtonY, buttonSize, GRAY);
 	}
 
 	if (previousButton.justReleased())
 	{
 		drawPreviousButton(previousButtonX, previousButtonY, buttonSize, WHITE);
-		drawPlayButton(BLACK);
-		drawPauseButton(WHITE);
+		if (mp.paused)
+		{
+			drawPlayButton(cx, cy - 20, BLACK);
+		}
+		drawPauseButton(cx, cy - 20, WHITE);
 		mp.previousSong();
 		mp.play();
 	}
@@ -639,31 +937,52 @@ void updateScreen()
 	{
 		if (mp.paused)
 		{
-			drawPlayButton(GRAY);
+			drawPlayButton(cx, cy - 20, GRAY);
 		}
 		else
 		{
-			drawPlayButton(BLACK);
-			drawPauseButton(GRAY);
+			drawPauseButton(cx, cy - 20, GRAY);
 		}
 	}
 
 	if (playPauseButton.justReleased())
 	{
-
 		if (mp.paused)
 		{
 			mp.play();
-			drawPlayButton(BLACK);
-			drawPauseButton(WHITE);
+			drawPlayButton(cx, cy - 20, BLACK);
+			drawPauseButton(cx, cy - 20, WHITE);
 		}
 		else
 		{
 			mp.pause();
-			drawPauseButton(BLACK);
-			drawPlayButton(WHITE);
-			dv(mp.percentComplete());
+			drawPauseButton(cx, cy - 20, BLACK);
+			drawPlayButton(cx, cy - 20, WHITE);
 		}
+	}
+
+	if (listButton.contains(p.x, p.y))
+	{
+		listButton.press(true);
+	}
+	else
+	{
+		listButton.press(false);
+	}
+
+	if (listButton.justPressed())
+	{
+		drawListButton(cx, tft.height() - 40, 60, 40, GRAY);
+	}
+
+	if (listButton.justReleased())
+	{
+		mp.pause();
+		curPage = mp.currentSong() / 5;
+		initSongListScreen(curPage);
+		//mp.play();
+		currentScreen = SONGLIST;
+		return;
 	}
 
 	if (mp.currentSong() != prevSong)
@@ -672,22 +991,18 @@ void updateScreen()
 		prevSong = mp.currentSong();
 	}
 
-	if (mp.percentComplete() - prog > .01)
-	{
-		
-	}
 	if (prog > mp.percentComplete())
 	{
 		prog = 0;
-		drawProgressBar(10, tft.width() - 10, 200, 10, prog, WHITE, true);
+		drawProgressBar(10, tft.width() - 10, 155, 10, prog, WHITE, true);
 	}
 	else
 	{
 		prog = mp.percentComplete();
-		drawProgressBar(10, tft.width() - 10, 200, 10, prog, WHITE, false);
+		drawProgressBar(10, tft.width() - 10, 155, 10, prog, WHITE, false);
 	}
-
 }
+
 
 void waitForTap()
 {
@@ -709,7 +1024,6 @@ void waitForTap()
 			done = true;
 		}
 	}
-
 }
 
 void waitForTap(unsigned long waitTime)
