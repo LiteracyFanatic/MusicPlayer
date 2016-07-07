@@ -11,6 +11,7 @@
 #ifndef _VSARDUINO_H_
 #define _VSARDUINO_H_
 #define __AVR_ATmega2560__
+#define _VMDEBUG 1
 #define F_CPU 16000000L
 #define ARDUINO 10607
 #define ARDUINO_AVR_MEGA2560
@@ -47,9 +48,17 @@ extern "C" void __cxa_pure_virtual() {;}
 #include <pins_arduino.h> 
 #undef cli
 #define cli()
-#include <MusicPlayer.ino>
-#include <Song.cpp>
-#include <Song.h>
+#include <MusicPlayerSketch.ino>
+#include <MusicPlayer.cpp>
+#include <MusicPlayer.h>
+#include <PlayerScreen.cpp>
+#include <PlayerScreen.h>
+#include <Screen.cpp>
+#include <Screen.h>
+#include <SongListScreen.cpp>
+#include <SongListScreen.h>
 #include <Songs.cpp>
 #include <Songs.h>
+#include <SplashScreen.cpp>
+#include <SplashScreen.h>
 #endif
