@@ -21,8 +21,6 @@ struct Song
 	const unsigned int *times2;
 	const unsigned int notes1Length;
 	const unsigned int notes2Length;
-	const char* title;
-	const unsigned int titleLength;
 };
 
 class MusicPlayer
@@ -42,7 +40,7 @@ public:
 	bool paused;
 	void play();
 	void pause();
-	const char* title();
+	//const char* title();
 	float percentComplete();
 	unsigned long currentSongDuration;
 	unsigned long calculateElapsedTime();

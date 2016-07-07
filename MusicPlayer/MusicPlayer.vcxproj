@@ -81,10 +81,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Song.h" />
+    <ClInclude Include="Songs.h" />
     <ClInclude Include="__vm\.MusicPlayer.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Song.cpp" />
+    <ClCompile Include="Songs.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

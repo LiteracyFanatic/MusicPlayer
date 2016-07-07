@@ -87,21 +87,21 @@ void MusicPlayer::pause()
 	paused = true;
 }
 
-const char* MusicPlayer::title()
-{
-	int len = pgm_read_word(&(songList[curSong])->titleLength);
-	//Serial.println(len);
-	char buffer[len];
-
-	for (int i = 0; i < len; i++)
-	{
-		strcpy_P(buffer, (char*)pgm_read_word(&(songList[curSong])->title));
-	}
-
-	//Serial.println(buffer);
-
-	return buffer;
-}
+//const char* MusicPlayer::title()
+//{
+//	int len = pgm_read_word(&(songList[curSong])->titleLength);
+//	//Serial.println(len);
+//	char buffer[len];
+//
+//	for (int i = 0; i < len; i++)
+//	{
+//		strcpy_P(buffer, (char*)pgm_read_word(&(songList[curSong])->title));
+//	}
+//
+//	//Serial.println(buffer);
+//
+//	return buffer;
+//}
 
 float MusicPlayer::percentComplete()
 {

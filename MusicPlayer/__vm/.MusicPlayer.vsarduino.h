@@ -50,4 +50,6 @@ extern "C" void __cxa_pure_virtual() {;}
 #include <MusicPlayer.ino>
 #include <Song.cpp>
 #include <Song.h>
+#include <Songs.cpp>
+#include <Songs.h>
 #endif
