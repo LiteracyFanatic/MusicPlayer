@@ -85,8 +85,6 @@ const struct Song* songList[] =
 	&undertaleSong
 };
 
-
-
 MusicPlayer mp = MusicPlayer(songList, sizeof(songList) / sizeof(songList[0]));
 #define TONE_1_PIN 22
 #define TONE_2_PIN 24
@@ -102,9 +100,17 @@ char* titles[7] =
 	"Bonetrousle"
 };
 
-SplashScreen splashScreen = SplashScreen(&tft, &ts, &mp);
-PlayerScreen playerScreen = PlayerScreen(&tft, &ts, &mp);
-SongListScreen songListScreen = SongListScreen(&tft, &ts, &mp);
+enum Screens
+{
+	PLAYER,
+	SONGLIST
+} currentScreen;
+
+SplashScreen splashScreen = SplashScreen(&tft, &ts);
+
+PlayerScreen playerScreen = PlayerScreen(&tft, &ts, titles, sizeof(titles) / sizeof(titles[0]));
+
+SongListScreen songListScreen = SongListScreen(&tft, &ts, titles, sizeof(titles) / sizeof(titles[0]));
 
 void setup()
 {
@@ -134,29 +140,58 @@ void setup()
 
 	tft.setRotation(3);
 
+	playerScreen.init();
+	playerScreen.onNextButtonPressed([]() {
+		mp.nextSong();
+		mp.play();
+	});
+	playerScreen.onPreviousPressed([]() {
+		mp.previousSong();
+		mp.play();
+	});
+	playerScreen.onPlayButtonPressed([]() {
+		mp.play();
+	});
+	playerScreen.onPauseButtonPressed([]() {
+		mp.pause();
+	});
+	playerScreen.onListButtonPressed([]() {
+		mp.pause();
+		songListScreen.curPage = mp.currentSong() / 5;
+		songListScreen.draw();
+		currentScreen = SONGLIST;
+	});
+	playerScreen.linkVariables([]() {
+		playerScreen.paused = mp.paused;
+		playerScreen.curSong = mp.currentSong();
+		playerScreen.prog = mp.percentComplete();
+	});
+
+	songListScreen.init();
+	songListScreen.onSongButtonPressed([]() {
+		mp.currentSong((songListScreen.curPage * 5) + songListScreen.pressedButton);
+		mp.play();
+		playerScreen.draw();
+		currentScreen = PLAYER;
+	});
+	songListScreen.onCDButtonPressed([]() {
+		playerScreen.draw();
+		currentScreen = PLAYER;
+	});
+	songListScreen.linkVariables([]() {
+
+	});
+
+	mp.init(22, 24);
+
 	splashScreen.draw();
 
 	splashScreen.waitForTap(5000);
 
-	mp.init(22, 24);
-	mp.currentSong(0);
-
-	//playerScreen.init();
-	//playerScreen.draw();
-
-	songListScreen.init();
-	songListScreen.draw();
+	playerScreen.draw();
 }
 
 unsigned long t = 0;
-
-enum Screens
-{
-	PLAYER,
-	SONGLIST
-};
-
-enum Screens currentScreen = SONGLIST;
 
 void loop()
 {
@@ -168,8 +203,6 @@ void loop()
 	case SONGLIST:
 		songListScreen.update();
 		break;
-	default:
-		break;
 	}
 
 	mp.run();
@@ -178,12 +211,11 @@ void loop()
 	{
 		if (t == 0)
 		{
-			t = millis() + (unsigned long)1500;
+			t = millis() + 1500;
 		}
 		if (millis() >= t && !mp.paused)
 		{
 			mp.nextSong();
-			mp.songDone = false;
 		}
 	}
 	else

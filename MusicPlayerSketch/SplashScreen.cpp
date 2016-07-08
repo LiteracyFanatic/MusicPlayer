@@ -4,11 +4,10 @@
 
 #include "SplashScreen.h"
 
-SplashScreen::SplashScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen, MusicPlayer *musicPlayer)
+SplashScreen::SplashScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen)
 {
 	tft = gfx;
 	ts = touchScreen;
-	mp = musicPlayer;
 }
 
 void SplashScreen::draw()

@@ -15,14 +15,13 @@
 class SplashScreen: public Screen
 {
 public:
-	SplashScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen, MusicPlayer *musicPlayer);
+	SplashScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen);
 	void draw();
 	void update();
 
 private:
 	//Adafruit_GFX *tft;
 	//TouchScreen *ts;
-	MusicPlayer *mp;
 	void drawArduinoLogo(unsigned int color);
 
 };

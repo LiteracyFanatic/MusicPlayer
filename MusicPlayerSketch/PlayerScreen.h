@@ -15,15 +15,34 @@
 class PlayerScreen: public Screen
 { 
 public:
-	PlayerScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen, MusicPlayer *musicPlayer);
+	PlayerScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen, char* t[], byte n);
 	void init();
 	void draw();
 	void update();
+	void onNextButtonPressed(void (*f)());
+	void onPreviousPressed(void(*f)());
+	void onPlayButtonPressed(void(*f)());
+	void onPauseButtonPressed(void(*f)());
+	void onListButtonPressed(void(*f)());
+	void linkVariables(void(*f)());
+	byte curSong = 0;
+	byte numberOfSongs;
+	bool paused = true;
+	float prog;
+	unsigned int themeColor = WHITE;
+	unsigned int backgroundColor = BLACK;
 
 private:
 	//Adafruit_GFX *tft;
 	//TouchScreen *ts;
 	MusicPlayer *mp;
+
+	void(*nextButtonAction)();
+	void(*previousButtonAction)();
+	void(*playButtonAction)();
+	void(*pauseButtonAction)();
+	void(*listButtonAction)();
+	void(*variableChangeAction)();
 
 	void drawListButton(int cx, int cy, int w, int h, unsigned int color);
 	void drawProgressBar(int x1, int x2, int y, int h, float p, unsigned int color, bool refresh);
@@ -51,19 +70,9 @@ private:
 	int previousButtonW;
 
 	byte prevSong = 0;
+	float lastProg = 0;
 
-	float prog;
-
-	char* titles[7] =
-	{
-		"Bach Partita 2",
-		"Bach Double",
-		"Bach Presto",
-		"Mario Castle",
-		"Mario Tune",
-		"Nyan Cat",
-		"Bonetrousle"
-	};
+	char **titles;
 };
 
 #endif

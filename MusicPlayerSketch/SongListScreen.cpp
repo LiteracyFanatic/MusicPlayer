@@ -4,12 +4,13 @@
 
 #include "SongListScreen.h"
 
-SongListScreen::SongListScreen(Adafruit_GFX * gfx, TouchScreen * touchScreen, MusicPlayer * musicPlayer)
+SongListScreen::SongListScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen, char* t[], byte n)
 {
 	tft = gfx;
 	ts = touchScreen;
-	mp = musicPlayer;
-	numberOfPages = ceil((float)mp->numberOfSongs / 5);
+	titles = t;
+	numberOfSongs = n;
+	numberOfPages = ceil((float)numberOfSongs / 5);
 }
 
 void SongListScreen::init()
@@ -25,20 +26,21 @@ void SongListScreen::drawCD(int cx, int cy, int r, unsigned int color, bool pres
 		tft->fillCircle(cx, cy, r, GRAY);
 		tft->drawCircle(cx, cy, r, color);
 		tft->fillCircle(cx, cy, r / 2, color);
-		tft->fillCircle(cx, cy, r / 5, BLACK);
+		tft->fillCircle(cx, cy, r / 5, backgroundColor);
 	}
 	else
 	{
 		tft->fillCircle(cx, cy, r, color);
 		tft->drawCircle(cx, cy, r, GRAY);
 		tft->fillCircle(cx, cy, r / 2, GRAY);
-		tft->fillCircle(cx, cy, r / 5, BLACK);
+		tft->fillCircle(cx, cy, r / 5, backgroundColor);
 	}
 }
 
 void SongListScreen::draw()
 {
-	tft->fillScreen(BLACK);
+	variableChangeAction();
+	tft->fillScreen(backgroundColor);
 	int margin = 10;
 
 	int w = tft->width() - 2 * margin;
@@ -55,37 +57,39 @@ void SongListScreen::draw()
 
 	for (byte i = 0; i < 5; i++)
 	{
-		songButtons[i].initButton(tft, buttonCenterx, margin + (buttonHeight / 2) + i * (margin + buttonHeight), buttonWidth, buttonHeight, WHITE, WHITE, BLACK, titles[i + 5 * curPage], 2);
+		songButtons[i].initButton(tft, buttonCenterx, margin + (buttonHeight / 2) + i * (margin + buttonHeight), buttonWidth, buttonHeight, themeColor, themeColor, backgroundColor, titles[i + 5 * curPage], 2);
 	}
 
 	for (byte i = 0; i < 5; i++)
 	{
-		if (5 * curPage + i < mp->numberOfSongs)
+		if (5 * curPage + i < numberOfSongs)
 		{
 			songButtons[i].drawButton();
 		}
 	}
 
-	upButton.initButton(tft, tcx, tcy1, tSide, tSide * cos(radians(30)), WHITE, BLUE, WHITE, NULL, 0);
-	downButton.initButton(tft, tcx, tcy2, tSide, tSide * cos(radians(30)), WHITE, BLUE, WHITE, NULL, 0);
+	upButton.initButton(tft, tcx, tcy1, tSide, tSide * cos(radians(30)), themeColor, BLUE, themeColor, NULL, 0);
+	downButton.initButton(tft, tcx, tcy2, tSide, tSide * cos(radians(30)), themeColor, BLUE, themeColor, NULL, 0);
 
 	if (curPage < numberOfPages - 1)
 	{
-		drawDownButton(tcx, tcy2, tSide, WHITE);
+		drawDownButton(tcx, tcy2, tSide, themeColor);
 	}
 
 	if (curPage > 0)
 	{
-		drawUpButton(tcx, tcy1, tSide, WHITE);
+		drawUpButton(tcx, tcy1, tSide, themeColor);
 	}
 
-	cdButton.initButton(tft, tcx, cy, 60, 60, WHITE, BLUE, WHITE, NULL, 0);
-	drawCD(tcx, cy, 30, WHITE, false);
+	cdButton.initButton(tft, tcx, cy, 60, 60, themeColor, BLUE, themeColor, NULL, 0);
+	drawCD(tcx, cy, 30, themeColor, false);
 
 }
 
 void SongListScreen::update()
 {
+	variableChangeAction();
+
 	int margin = 10;
 
 	int w = tft->width() - 2 * margin;
@@ -125,7 +129,7 @@ void SongListScreen::update()
 
 	for (byte i = 0; i < 5; i++)
 	{
-		if (5 * curPage + i < mp->numberOfSongs)
+		if (5 * curPage + i < numberOfSongs)
 		{
 			if (songButtons[i].contains(p.x, p.y))
 			{
@@ -149,11 +153,9 @@ void SongListScreen::update()
 		{
 			songButtons[i].drawButton();
 
-			mp->currentSong((curPage * 5) + i);
+			pressedButton = i;
 
-			mp->play();
-			//initPlayerScreen();
-			//currentScreen = PLAYER;
+			songButtonAction();
 			return;
 		}
 	}
@@ -222,18 +224,31 @@ void SongListScreen::update()
 
 	if (cdButton.justPressed())
 	{
-		drawCD(tcx, cy, 30, WHITE, true);
+		drawCD(tcx, cy, 30, themeColor, true);
 	}
 
 	if (cdButton.justReleased())
 	{
-		drawCD(tcx, cy, 30, WHITE, false);
-		//initPlayerScreen();
-		//currentScreen = PLAYER;
+		drawCD(tcx, cy, 30, themeColor, false);
+		cdButtonAction();
 		return;
 	}
 }
 
+void SongListScreen::onSongButtonPressed(void(*f)())
+{
+	songButtonAction = f;
+}
+
+void SongListScreen::onCDButtonPressed(void(*f)())
+{
+	cdButtonAction = f;
+}
+
+void SongListScreen::linkVariables(void(*f)())
+{
+	variableChangeAction = f;
+}
 
 void SongListScreen::drawUpButton(int cx, int cy, int ts, unsigned int color)
 {

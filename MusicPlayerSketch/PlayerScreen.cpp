@@ -5,11 +5,12 @@
 #include "PlayerScreen.h"
 
 
-PlayerScreen::PlayerScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen, MusicPlayer *musicPlayer)
+PlayerScreen::PlayerScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen, char* t[], byte n)
 {
 	tft = gfx;
 	ts = touchScreen;
-	mp = musicPlayer;
+	titles = t;
+	numberOfSongs = n;
 }
 
 void PlayerScreen::init()
@@ -22,46 +23,46 @@ void PlayerScreen::init()
 	previousButtonX = 20;
 	previousButtonY = cy - (buttonSize / 2) - 20;
 
-	nextButtonW = drawNextButton(nextButtonX, nextButtonY, buttonSize, WHITE);
-	previousButtonW = drawPreviousButton(previousButtonX, previousButtonY, buttonSize, WHITE);
+	//BLETCHEROUS HACK
+	nextButtonW = buttonSize * 2 - 18;
+	previousButtonW = buttonSize * 2 - 18;
+	//BLETCHEROUS HACK
 }
 
 void PlayerScreen::draw()
 {
-	tft->fillScreen(BLACK);
+	variableChangeAction();
+	tft->fillScreen(backgroundColor);
 
-	if (mp->paused)
+	if (paused)
 	{
-		drawPlayButton(cx, cy - 20, WHITE);
+		drawPlayButton(cx, cy - 20, themeColor);
 	}
 	else
 	{
-		drawPauseButton(cx, cy - 20, WHITE);
+		drawPauseButton(cx, cy - 20, themeColor);
 	}
 
-	playPauseButton.initButton(tft, cx, cy - 20, buttonSize, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
+	playPauseButton.initButton(tft, cx, cy - 20, buttonSize, buttonSize, themeColor, BLUE, themeColor, NULL, 3);
 
-	nextButtonX = tft->width() - (buttonSize * 2) - 2;
-	nextButtonY = cy - (buttonSize / 2) - 20;
-	previousButtonX = 20;
-	previousButtonY = cy - (buttonSize / 2) - 20;
+	drawNextButton(nextButtonX, nextButtonY, buttonSize, themeColor);
+	drawPreviousButton(previousButtonX, previousButtonY, buttonSize, themeColor);
 
-	nextButtonW = drawNextButton(nextButtonX, nextButtonY, buttonSize, WHITE);
-	previousButtonW = drawPreviousButton(previousButtonX, previousButtonY, buttonSize, WHITE);
+	nextButton.initButton(tft, nextButtonX + nextButtonW / 2, nextButtonY + buttonSize / 2, nextButtonW, buttonSize, themeColor, BLUE, themeColor, NULL, 3);
 
-	nextButton.initButton(tft, nextButtonX + nextButtonW / 2, nextButtonY + buttonSize / 2, nextButtonW, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
-
-	previousButton.initButton(tft, previousButtonX + previousButtonW / 2, previousButtonY + buttonSize / 2, previousButtonW, buttonSize, WHITE, BLUE, WHITE, NULL, 3);
+	previousButton.initButton(tft, previousButtonX + previousButtonW / 2, previousButtonY + buttonSize / 2, previousButtonW, buttonSize, themeColor, BLUE, themeColor, NULL, 3);
 
 	displayTitle();
-	drawProgressBar(10, tft->width() - 10, 155, 10, prog, WHITE, true);
+	drawProgressBar(10, tft->width() - 10, 155, 10, prog, themeColor, true);
 
-	listButton.initButton(tft, cx, tft->height() - 30, 60, 40, WHITE, BLACK, WHITE, NULL, 0);
-	drawListButton(cx, tft->height() - 40, 60, 40, WHITE);
+	listButton.initButton(tft, cx, tft->height() - 30, 60, 40, themeColor, backgroundColor, themeColor, NULL, 0);
+	drawListButton(cx, tft->height() - 40, 60, 40, themeColor);
 }
 
 void PlayerScreen::update()
 {
+	variableChangeAction();
+
 	digitalWrite(13, HIGH);
 	TSPoint p = ts->getPoint();
 	digitalWrite(13, LOW);
@@ -96,14 +97,13 @@ void PlayerScreen::update()
 
 	if (nextButton.justReleased())
 	{
-		drawNextButton(nextButtonX, nextButtonY, buttonSize, WHITE);
-		if (mp->paused)
+		drawNextButton(nextButtonX, nextButtonY, buttonSize, themeColor);
+		if (paused)
 		{
-			drawPlayButton(cx, cy - 20, BLACK);
+			drawPlayButton(cx, cy - 20, backgroundColor);
 		}
-		drawPauseButton(cx, cy - 20, WHITE);
-		mp->nextSong();
-		mp->play();
+		drawPauseButton(cx, cy - 20, themeColor);
+		nextButtonAction();
 	}
 
 	if (previousButton.contains(p.x, p.y))
@@ -122,14 +122,13 @@ void PlayerScreen::update()
 
 	if (previousButton.justReleased())
 	{
-		drawPreviousButton(previousButtonX, previousButtonY, buttonSize, WHITE);
-		if (mp->paused)
+		drawPreviousButton(previousButtonX, previousButtonY, buttonSize, themeColor);
+		if (paused)
 		{
-			drawPlayButton(cx, cy - 20, BLACK);
+			drawPlayButton(cx, cy - 20, backgroundColor);
 		}
-		drawPauseButton(cx, cy - 20, WHITE);
-		mp->previousSong();
-		mp->play();
+		drawPauseButton(cx, cy - 20, themeColor);
+		previousButtonAction();
 	}
 
 	if (playPauseButton.contains(p.x, p.y))
@@ -143,7 +142,7 @@ void PlayerScreen::update()
 
 	if (playPauseButton.justPressed())
 	{
-		if (mp->paused)
+		if (paused)
 		{
 			drawPlayButton(cx, cy - 20, GRAY);
 		}
@@ -155,17 +154,17 @@ void PlayerScreen::update()
 
 	if (playPauseButton.justReleased())
 	{
-		if (mp->paused)
+		if (paused)
 		{
-			mp->play();
-			drawPlayButton(cx, cy - 20, BLACK);
-			drawPauseButton(cx, cy - 20, WHITE);
+			playButtonAction();
+			drawPlayButton(cx, cy - 20, backgroundColor);
+			drawPauseButton(cx, cy - 20, themeColor);
 		}
 		else
 		{
-			mp->pause();
-			drawPauseButton(cx, cy - 20, BLACK);
-			drawPlayButton(cx, cy - 20, WHITE);
+			pauseButtonAction();
+			drawPauseButton(cx, cy - 20, backgroundColor);
+			drawPlayButton(cx, cy - 20, themeColor);
 		}
 	}
 
@@ -185,30 +184,58 @@ void PlayerScreen::update()
 
 	if (listButton.justReleased())
 	{
-		mp->pause();
-		//curPage = mp->currentSong() / 5;
-		//initSongListScreen(curPage);
-		//mp->play();
-		//currentScreen = SONGLIST;
+		drawListButton(cx, tft->height() - 40, 60, 40, themeColor);
+		listButtonAction();
 		return;
 	}
 
-	if (mp->currentSong() != prevSong)
+	if (curSong != prevSong)
 	{
 		displayTitle();
-		prevSong = mp->currentSong();
+		prevSong = curSong;
 	}
 
-	if (prog > mp->percentComplete())
+	if (lastProg > prog)
 	{
-		prog = 0;
-		drawProgressBar(10, tft->width() - 10, 155, 10, prog, WHITE, true);
+		lastProg = 0;
+		drawProgressBar(10, tft->width() - 10, 155, 10, prog, themeColor, true);
 	}
 	else
 	{
-		prog = mp->percentComplete();
-		drawProgressBar(10, tft->width() - 10, 155, 10, prog, WHITE, false);
+		lastProg = prog;
+		drawProgressBar(10, tft->width() - 10, 155, 10, prog, themeColor, false);
 	}
+
+}
+
+void PlayerScreen::onNextButtonPressed(void(*f)())
+{
+	nextButtonAction = f;
+}
+
+void PlayerScreen::onPreviousPressed(void(*f)())
+{
+	previousButtonAction = f;
+}
+
+void PlayerScreen::onPlayButtonPressed(void(*f)())
+{
+	playButtonAction = f;
+}
+
+void PlayerScreen::onPauseButtonPressed(void(*f)())
+{
+	pauseButtonAction = f;
+}
+
+void PlayerScreen::onListButtonPressed(void(*f)())
+{
+	listButtonAction = f;
+}
+
+void PlayerScreen::linkVariables(void(*f)())
+{
+	variableChangeAction = f;
 }
 
 void PlayerScreen::drawListButton(int cx, int cy, int w, int h, unsigned int color)
@@ -234,12 +261,12 @@ void PlayerScreen::drawProgressBar(int x1, int x2, int y, int h, float p, unsign
 
 void PlayerScreen::displayTitle()
 {
-	tft->fillRect(0, 0, tft->width(), 40, BLACK);
+	tft->fillRect(0, 0, tft->width(), 40, backgroundColor);
 	tft->setCursor(10, 10);
 	tft->setTextSize(3);
 
-	tft->setTextColor(WHITE);
-	tft->print(titles[mp->currentSong()]);
+	tft->setTextColor(themeColor);
+	tft->print(titles[curSong]);
 }
 
 void PlayerScreen::drawPlayButton(int cx, int cy, unsigned int color)
