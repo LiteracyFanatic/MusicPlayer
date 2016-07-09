@@ -4,13 +4,12 @@
 
 #include "PlayerScreen.h"
 
-
 PlayerScreen::PlayerScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen, char* t[], byte n)
 {
 	tft = gfx;
 	ts = touchScreen;
 	titles = t;
-	numberOfSongs = n;
+	numberOfPages = n;
 }
 
 void PlayerScreen::init()
@@ -18,15 +17,21 @@ void PlayerScreen::init()
 	cx = tft->width() / 2;
 	cy = tft->height() / 2;
 
-	nextButtonX = tft->width() - (buttonSize * 2) - 2;
-	nextButtonY = cy - (buttonSize / 2) - 20;
-	previousButtonX = 20;
-	previousButtonY = cy - (buttonSize / 2) - 20;
-
-	//BLETCHEROUS HACK
-	nextButtonW = buttonSize * 2 - 18;
-	previousButtonW = buttonSize * 2 - 18;
-	//BLETCHEROUS HACK
+	playPauseButtonSize = 50;
+	playPauseButtonX = cx;
+	npButtonH = 50;
+	npButtonW = npButtonH * 1.8;
+	nextButtonX = tft->width() - (playPauseButtonSize + 10);
+	previousButtonX = playPauseButtonSize + 10;
+	controlsY = cy - 20;
+	progressBarX0 = 10;
+	progressBarX1 = tft->width() - 10;
+	progressBarY = 155;
+	progressBarH = 10;
+	listButtonX = cx;
+	listButtonY = tft->height() - 30;
+	listButtonW = 60;
+	listButtonH = 40;
 }
 
 void PlayerScreen::draw()
@@ -36,50 +41,37 @@ void PlayerScreen::draw()
 
 	if (paused)
 	{
-		drawPlayButton(cx, cy - 20, themeColor);
+		drawPlayButton(cx, controlsY, playPauseButtonSize, playPauseButtonSize, themeColor);
 	}
 	else
 	{
-		drawPauseButton(cx, cy - 20, themeColor);
+		drawPauseButton(cx, controlsY, playPauseButtonSize, playPauseButtonSize, themeColor);
 	}
 
-	playPauseButton.initButton(tft, cx, cy - 20, buttonSize, buttonSize, themeColor, BLUE, themeColor, NULL, 3);
+	playPauseButton.initButton(tft, playPauseButtonX, controlsY, playPauseButtonSize, playPauseButtonSize, themeColor, BLUE, themeColor, NULL, 3);
 
-	drawNextButton(nextButtonX, nextButtonY, buttonSize, themeColor);
-	drawPreviousButton(previousButtonX, previousButtonY, buttonSize, themeColor);
 
-	nextButton.initButton(tft, nextButtonX + nextButtonW / 2, nextButtonY + buttonSize / 2, nextButtonW, buttonSize, themeColor, BLUE, themeColor, NULL, 3);
 
-	previousButton.initButton(tft, previousButtonX + previousButtonW / 2, previousButtonY + buttonSize / 2, previousButtonW, buttonSize, themeColor, BLUE, themeColor, NULL, 3);
+	nextButton.initButton(tft, nextButtonX, controlsY, playPauseButtonSize * 1.8, playPauseButtonSize, themeColor, BLUE, themeColor, NULL, 3);
+
+	previousButton.initButton(tft, previousButtonX, controlsY, playPauseButtonSize * 1.8, playPauseButtonSize, themeColor, BLUE, themeColor, NULL, 3);
+
+	drawNextButton(nextButtonX, controlsY, playPauseButtonSize * 1.8, playPauseButtonSize, themeColor);
+	drawPreviousButton(previousButtonX, controlsY, playPauseButtonSize * 1.8, playPauseButtonSize, themeColor);
 
 	displayTitle();
-	drawProgressBar(10, tft->width() - 10, 155, 10, prog, themeColor, true);
 
-	listButton.initButton(tft, cx, tft->height() - 30, 60, 40, themeColor, backgroundColor, themeColor, NULL, 0);
-	drawListButton(cx, tft->height() - 40, 60, 40, themeColor);
+	drawProgressBar(progressBarX0, progressBarX1, progressBarY, progressBarH, prog, themeColor, true);
+
+	listButton.initButton(tft, listButtonX, listButtonY, listButtonW, listButtonH, themeColor, backgroundColor, themeColor, NULL, 0);
+	drawListButton(listButtonX, listButtonY, listButtonW, listButtonH, themeColor);
 }
 
 void PlayerScreen::update()
 {
 	variableChangeAction();
 
-	digitalWrite(13, HIGH);
-	TSPoint p = ts->getPoint();
-	digitalWrite(13, LOW);
-
-	// if sharing pins, you'll need to fix the directions of the touchscreen pins
-	//pinMode(XP, OUTPUT);
-	pinMode(XM, OUTPUT);
-	pinMode(YP, OUTPUT);
-	//pinMode(YM, OUTPUT);
-
-
-	if (p.z > MINPRESSURE && p.z < MAXPRESSURE)
-	{
-		int tempPY = p.y;
-		p.y = (map(p.x, TS_MINX, TS_MAXX, 0, tft->height()));
-		p.x = (map(tempPY, TS_MINY, TS_MAXY, 0, tft->width()));
-	}
+	TSPoint p = readPoint();
 
 	if (nextButton.contains(p.x, p.y))
 	{
@@ -92,17 +84,12 @@ void PlayerScreen::update()
 
 	if (nextButton.justPressed())
 	{
-		drawNextButton(nextButtonX, nextButtonY, buttonSize, GRAY);
+		drawNextButton(nextButtonX, controlsY, playPauseButtonSize * 1.8, playPauseButtonSize, GRAY);
 	}
 
 	if (nextButton.justReleased())
 	{
-		drawNextButton(nextButtonX, nextButtonY, buttonSize, themeColor);
-		if (paused)
-		{
-			drawPlayButton(cx, cy - 20, backgroundColor);
-		}
-		drawPauseButton(cx, cy - 20, themeColor);
+		drawNextButton(nextButtonX, controlsY, playPauseButtonSize * 1.8, playPauseButtonSize, themeColor);
 		nextButtonAction();
 	}
 
@@ -117,17 +104,12 @@ void PlayerScreen::update()
 
 	if (previousButton.justPressed())
 	{
-		drawPreviousButton(previousButtonX, previousButtonY, buttonSize, GRAY);
+		drawPreviousButton(previousButtonX, controlsY, playPauseButtonSize * 1.8, playPauseButtonSize, GRAY);
 	}
 
 	if (previousButton.justReleased())
 	{
-		drawPreviousButton(previousButtonX, previousButtonY, buttonSize, themeColor);
-		if (paused)
-		{
-			drawPlayButton(cx, cy - 20, backgroundColor);
-		}
-		drawPauseButton(cx, cy - 20, themeColor);
+		drawPreviousButton(previousButtonX, controlsY, playPauseButtonSize * 1.8, playPauseButtonSize, themeColor);
 		previousButtonAction();
 	}
 
@@ -144,11 +126,11 @@ void PlayerScreen::update()
 	{
 		if (paused)
 		{
-			drawPlayButton(cx, cy - 20, GRAY);
+			drawPlayButton(playPauseButtonX, controlsY, playPauseButtonSize, playPauseButtonSize, GRAY);
 		}
 		else
 		{
-			drawPauseButton(cx, cy - 20, GRAY);
+			drawPauseButton(playPauseButtonX, controlsY, playPauseButtonSize, playPauseButtonSize, GRAY);
 		}
 	}
 
@@ -157,15 +139,16 @@ void PlayerScreen::update()
 		if (paused)
 		{
 			playButtonAction();
-			drawPlayButton(cx, cy - 20, backgroundColor);
-			drawPauseButton(cx, cy - 20, themeColor);
+			drawPlayButton(playPauseButtonX, controlsY, playPauseButtonSize, playPauseButtonSize, backgroundColor);
+			drawPauseButton(playPauseButtonX, controlsY, playPauseButtonSize, playPauseButtonSize, themeColor);
 		}
 		else
 		{
 			pauseButtonAction();
-			drawPauseButton(cx, cy - 20, backgroundColor);
-			drawPlayButton(cx, cy - 20, themeColor);
+			drawPauseButton(playPauseButtonX, controlsY, playPauseButtonSize, playPauseButtonSize, backgroundColor);
+			drawPlayButton(playPauseButtonX, controlsY, playPauseButtonSize, playPauseButtonSize, themeColor);
 		}
+		paused = !paused;
 	}
 
 	if (listButton.contains(p.x, p.y))
@@ -179,33 +162,32 @@ void PlayerScreen::update()
 
 	if (listButton.justPressed())
 	{
-		drawListButton(cx, tft->height() - 40, 60, 40, GRAY);
+		drawListButton(listButtonX, listButtonY, listButtonW, listButtonH, GRAY);
 	}
 
 	if (listButton.justReleased())
 	{
-		drawListButton(cx, tft->height() - 40, 60, 40, themeColor);
+		drawListButton(listButtonX, listButtonY, listButtonW, listButtonH, themeColor);
 		listButtonAction();
 		return;
 	}
 
-	if (curSong != prevSong)
+	if (currentPage != prevSong)
 	{
 		displayTitle();
-		prevSong = curSong;
+		prevSong = currentPage;
 	}
 
 	if (lastProg > prog)
 	{
 		lastProg = 0;
-		drawProgressBar(10, tft->width() - 10, 155, 10, prog, themeColor, true);
+		drawProgressBar(progressBarX0, progressBarX1, progressBarY, progressBarH, prog, themeColor, true);
 	}
 	else
 	{
 		lastProg = prog;
-		drawProgressBar(10, tft->width() - 10, 155, 10, prog, themeColor, false);
+		drawProgressBar(progressBarX0, progressBarX1, progressBarY, progressBarH, prog, themeColor, false);
 	}
-
 }
 
 void PlayerScreen::onNextButtonPressed(void(*f)())
@@ -238,6 +220,65 @@ void PlayerScreen::linkVariables(void(*f)())
 	variableChangeAction = f;
 }
 
+byte PlayerScreen::getCurrentPage()
+{
+	return currentPage;
+}
+
+void PlayerScreen::setCurrentPage(byte cs)
+{
+	if (cs < numberOfPages)
+	{
+		currentPage = cs;
+	}
+}
+
+void PlayerScreen::drawPlayButton(int cx, int cy, int w, int h, unsigned int color)
+{
+	tft->fillTriangle(cx - w / 2, cy - h / 2, cx + w / 2, cy, cx - w / 2, cy + h / 2, color);
+}
+
+void PlayerScreen::drawPauseButton(int cx, int cy, int w, int h, unsigned int color)
+{
+	tft->fillRect(cx - playPauseButtonSize / 2, cy - playPauseButtonSize / 2, 15, playPauseButtonSize, color);
+	tft->fillRect(cx + (playPauseButtonSize / 2) - 15, cy - playPauseButtonSize / 2, 15, playPauseButtonSize, color);
+}
+
+void PlayerScreen::drawNextButton(int cx, int cy, int w, int h, unsigned int color)
+{
+	int x0 = cx - w / 2;
+	int y0 = cy - h / 2;
+	int x1 = x0 + w;
+	int y1 = y0 + h;
+	int overLap = w / 10;
+
+	tft->fillTriangle(x0, y0, cx + overLap, cy, x0, y1, color);
+	tft->fillTriangle(cx - overLap, y0, x1 - 1, cy, cx - overLap, y1, color);
+	tft->fillRect(x1 - 10, y0, 10, h, color);
+}
+
+void PlayerScreen::drawPreviousButton(int cx, int cy, int w, int h, unsigned int color)
+{
+	int x0 = cx - w / 2;
+	int y0 = cy - h / 2;
+	int x1 = x0 + w;
+	int y1 = y0 + h;
+	int overLap = w / 10;
+
+	tft->fillRect(x0, y0, 10, h, color);
+	tft->fillTriangle(x0 + 1, cy, cx + overLap, y0, cx + overLap, y1, color);
+	tft->fillTriangle(cx - overLap, cy, x1, y0, x1, y1, color);
+}
+
+void PlayerScreen::displayTitle()
+{
+	tft->fillRect(0, 0, tft->width(), 40, backgroundColor);
+	tft->setCursor(10, 10);
+	tft->setTextSize(3);
+	tft->setTextColor(themeColor);
+	tft->print(titles[currentPage]);
+}
+
 void PlayerScreen::drawListButton(int cx, int cy, int w, int h, unsigned int color)
 {
 	int margin = 5;
@@ -257,49 +298,6 @@ void PlayerScreen::drawProgressBar(int x1, int x2, int y, int h, float p, unsign
 	int progressWidth = (int)mapFloat(p, 0, 1, x1, x2);
 	progressWidth = constrain(progressWidth, 0, x2 - x1);
 	tft->fillRoundRect(x1 + 2, y - (h / 2) + 2, progressWidth - 4, h - 4, (h - 4) / 2, color);
-}
-
-void PlayerScreen::displayTitle()
-{
-	tft->fillRect(0, 0, tft->width(), 40, backgroundColor);
-	tft->setCursor(10, 10);
-	tft->setTextSize(3);
-
-	tft->setTextColor(themeColor);
-	tft->print(titles[curSong]);
-}
-
-void PlayerScreen::drawPlayButton(int cx, int cy, unsigned int color)
-{
-	tft->fillTriangle(cx - buttonSize / 2, cy - buttonSize / 2, cx + buttonSize / 2, cy, cx - buttonSize / 2, cy + buttonSize / 2, color);
-}
-
-void PlayerScreen::drawPauseButton(int cx, int cy, unsigned int color)
-{
-	tft->fillRect(cx - buttonSize / 2, cy - buttonSize / 2, 15, buttonSize, color);
-	tft->fillRect(cx + (buttonSize / 2) - 15, cy - buttonSize / 2, 15, buttonSize, color);
-}
-
-int PlayerScreen::drawNextButton(int x, int y, int h, unsigned int color)
-{
-	int w = (h * 2) - 18;
-	tft->fillTriangle(x, y, x + h, y + h / 2, x, y + h, color);
-	x += h - 20;
-	tft->fillTriangle(x, y, x + h, y + h / 2, x, y + h, color);
-	x += h - 5;
-	tft->fillRect(x, y, 7, h, color);
-	return w;
-}
-
-int PlayerScreen::drawPreviousButton(int x, int y, int h, unsigned int color)
-{
-	int w = (h * 2) - 18;
-	tft->fillRect(x, y, 7, h, color);
-	x += 2;
-	tft->fillTriangle(x, y + h / 2, x + h, y, x + h, y + h, color);
-	x += h - 20;
-	tft->fillTriangle(x, y + h / 2, x + h, y, x + h, y + h, color);
-	return w;
 }
 
 float PlayerScreen::mapFloat(double x, double in_min, double in_max, double out_min, double out_max)

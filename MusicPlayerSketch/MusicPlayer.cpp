@@ -1,78 +1,17 @@
 #include <Tone.h>
 #include "MusicPlayer.h"
 
-#define dv(v) Serial.print(#v); Serial.print(" = "); Serial.println(v);
-
-
 MusicPlayer::MusicPlayer(const struct Song* *sl, byte n)
 {
 	songList = sl;
 	numberOfSongs = n;
-	curSong = 0;
-	t1 = 0;
-	t2 = 0;
-	ti = NULL;
-	paused = 0;
-	note1Index = 0;
-	note2Index = 0;
-	songDone = false;
-	paused = true;
-	pausedTime = 0;
-	dt = 0;
-	calculateDuration(songList[curSong]);
+	calculateDuration(songList[currentSong]);
 }
 
-void MusicPlayer::init(byte t1, byte t2)
+void MusicPlayer::attachPins(byte t1, byte t2)
 {
 	tone1.begin(t1);
 	tone2.begin(t2);
-}
-
-void MusicPlayer::currentSong(byte cs)
-{
-	curSong = cs;
-	t1 = 0;
-	t2 = 0;
-	ti = NULL;
-	note1Index = 0;
-	note2Index = 0;
-	songDone = false;
-	pausedTime = 0;
-	calculateDuration(songList[curSong]);
-}
-
-byte MusicPlayer::currentSong()
-{
-	return curSong;
-}
-
-void MusicPlayer::nextSong()
-{
-	if (curSong < numberOfSongs - 1)
-	{
-		currentSong(currentSong() + 1);
-	}
-	else
-	{
-		currentSong(0);
-	}
-}
-
-void MusicPlayer::previousSong()
-{
-	if (curSong == 0)
-	{
-		currentSong(numberOfSongs - 1);
-	}
-	else
-	{
-		currentSong(currentSong() - 1);
-	}
-}
-
-void MusicPlayer::run()
-{
-	playSong(songList[curSong]);
 }
 
 void MusicPlayer::play()
@@ -87,28 +26,79 @@ void MusicPlayer::pause()
 	paused = true;
 }
 
-//const char* MusicPlayer::title()
-//{
-//	int len = pgm_read_word(&(songList[curSong])->titleLength);
-//	//Serial.println(len);
-//	char buffer[len];
-//
-//	for (int i = 0; i < len; i++)
-//	{
-//		strcpy_P(buffer, (char*)pgm_read_word(&(songList[curSong])->title));
-//	}
-//
-//	//Serial.println(buffer);
-//
-//	return buffer;
-//}
+void MusicPlayer::nextSong()
+{
+	if (currentSong < numberOfSongs - 1)
+	{
+		setCurrentSong(currentSong + 1);
+	}
+	else
+	{
+		setCurrentSong(0);
+	}
+}
+
+void MusicPlayer::previousSong()
+{
+	if (currentSong == 0)
+	{
+		setCurrentSong(numberOfSongs - 1);
+	}
+	else
+	{
+		setCurrentSong(currentSong - 1);
+	}
+}
+
+void MusicPlayer::process()
+{
+	playSong(songList[currentSong]);
+}
+
+byte MusicPlayer::getCurrentSong()
+{
+	return currentSong;
+}
+
+void MusicPlayer::setCurrentSong(byte cs)
+{
+	if (cs < numberOfSongs)
+	{
+		currentSong = cs;
+		t1 = 0;
+		t2 = 0;
+		ti = NULL;
+		pausedTime = 0;
+		note1Index = 0;
+		note2Index = 0;
+		buzzer1Done = false;
+		buzzer2Done = false;
+		songDone = false;
+		calculateDuration(songList[currentSong]);
+	}
+}
+
+unsigned long MusicPlayer::getCurrentSongDurration()
+{
+	return currentSongDuration;
+}
+
+bool MusicPlayer::donePlaying()
+{
+	return songDone;
+}
+
+bool MusicPlayer::isPaused()
+{
+	return paused;
+}
 
 float MusicPlayer::percentComplete()
 {
 	return (float)calculateElapsedTime() / currentSongDuration;
 }
 
-void MusicPlayer::calculateDuration(const Song * song)
+void MusicPlayer::calculateDuration(const Song* song)
 {
 	int noteLen1 = pgm_read_word(&(song->notes1Length));
 	int noteLen2 = pgm_read_word(&(song->notes2Length));
@@ -131,35 +121,40 @@ void MusicPlayer::calculateDuration(const Song * song)
 
 unsigned long MusicPlayer::calculateElapsedTime()
 {
-	const Song * song = songList[curSong];
+	const Song* song = songList[currentSong];
+
+	int noteLen1 = pgm_read_word(&(song->notes1Length));
+	int noteLen2 = pgm_read_word(&(song->notes2Length));
 
 	unsigned long d1 = 0;
 	unsigned long d2 = 0;
 
 	for (int i = 0; i < note1Index; i++)
 	{
+		if (i > noteLen1 - 1)
+		{
+			break;
+		}
 		d1 += pgm_read_word(pgm_read_word(&(song->times1)) + i * sizeof(unsigned int));
 	}
 
 	for (int j = 0; j < note2Index; j++)
 	{
+		if (j > noteLen2 - 1)
+		{
+			break;
+		}
 		d2 += pgm_read_word(pgm_read_word(&(song->times2)) + j * sizeof(unsigned int));
 	}
 
 	return max(d1, d2);
 }
 
-
 void MusicPlayer::playSong(const struct Song* song)
 {
 	if (songDone)
 	{
 		return;
-	}
-
-	if (ti == NULL)
-	{
-		ti = millis();
 	}
 
 	if (paused)
@@ -171,76 +166,70 @@ void MusicPlayer::playSong(const struct Song* song)
 		return;
 	}
 
+	if (ti == NULL)
+	{
+		ti = millis();
+	}
+
 	t1 += pausedTime;
 	t2 += pausedTime;
 	pausedTime = 0;
 
-
-	bool part1Exists = pgm_read_word(&(song->notes1)); //&& pgm_read_word(&(song->times1));
-	bool part2Exists = pgm_read_word(&(song->notes2)); //&& pgm_read_word(&(song->times2));
-
-	unsigned int curNote1 = 0;
-	unsigned int curTime1 = 0;
-	unsigned int curNote2 = 0;
-	unsigned int curTime2 = 0;
+	bool part1Exists = pgm_read_word(&(song->notes1));
+	bool part2Exists = pgm_read_word(&(song->notes2));
 
 	int noteLen1 = pgm_read_word(&(song->notes1Length));
 	int noteLen2 = pgm_read_word(&(song->notes2Length));
-
-	//Serial.print("noteLen1 = "); Serial.println(noteLen1);
-	//Serial.print("noteLen2 = "); Serial.println(noteLen2);
-
-	//dv(curTime1);
 
 	dt = millis();
 
 	if (part1Exists && (dt >= t1 + ti))
 	{
-		tone1.stop();
-		delay(5);
+		if (note1Index > noteLen1 - 1)
+		{
+			tone1.stop();
+			buzzer1Done = true;
+		}
+		else
+		{
+			tone1.stop();
+			delay(5);
 
-		curNote1 = pgm_read_word(pgm_read_word(&(song->notes1)) + note1Index * sizeof(unsigned int));
-		curTime1 = pgm_read_word(pgm_read_word(&(song->times1)) + note1Index * sizeof(unsigned int));
+			int curNote1 = pgm_read_word(pgm_read_word(&(song->notes1)) + note1Index * sizeof(unsigned int));
+			int curTime1 = pgm_read_word(pgm_read_word(&(song->times1)) + note1Index * sizeof(unsigned int));
 
-		note1Index++;
-		//Serial.print("curNote1 = "); Serial.println(curNote1);
-		//Serial.print("curTime1 = "); Serial.println(curTime1);
-		t1 += (long)curTime1;
-		tone1.play(curNote1, curTime1);
+			note1Index++;
+
+			t1 += curTime1;
+			tone1.play(curNote1, curTime1);
+		}
 	}
 
 	if (part2Exists && (dt >= t2 + ti))
 	{
-		tone2.stop();
-		delay(5);
+		if (note2Index > noteLen2 - 1)
+		{
+			tone2.stop();
+			buzzer2Done = true;
+		}
+		else
+		{
+			tone2.stop();
+			delay(5);
 
-		curNote2 = pgm_read_word(pgm_read_word(&(song->notes2)) + note2Index * sizeof(unsigned int));
-		curTime2 = pgm_read_word(pgm_read_word(&(song->times2)) + note2Index * sizeof(unsigned int));
+			int curNote2 = pgm_read_word(pgm_read_word(&(song->notes2)) + note2Index * sizeof(unsigned int));
+			int curTime2 = pgm_read_word(pgm_read_word(&(song->times2)) + note2Index * sizeof(unsigned int));
 
-		note2Index++;
-		//Serial.print("curNote2 = "); Serial.println(curNote2);
-		//Serial.print("curTime2 = "); Serial.println(curTime2);
-		t2 += (long)curTime2;
-		tone2.play(curNote2, curTime2);
+			note2Index++;
+
+			t2 += curTime2;
+			tone2.play(curNote2, curTime2);
+		}
 	}
 
-	if (note1Index > noteLen1)
-	{
-		tone1.stop();
-	}
-	if (note2Index > noteLen2)
-	{
-		tone2.stop();
-	}
-	if ((!part1Exists || note1Index > noteLen1) && (!part2Exists || note2Index > noteLen2))
+	if ((!part1Exists || buzzer1Done) && (!part2Exists || buzzer2Done))
 	{
 		songDone = true;
-		note1Index = -1;
-		note2Index = -1;
-		ti = NULL;
-		t1 = 0;
-		t2 = 0;
 		return;
 	}
-
 }

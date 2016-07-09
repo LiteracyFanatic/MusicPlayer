@@ -76,6 +76,7 @@ Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 
 const struct Song* songList[] =
 {
+	//&tetrisSong,
 	&bachPartita2GigaSong,
 	&bachDoubleSong,
 	&bachSong,
@@ -91,6 +92,7 @@ MusicPlayer mp = MusicPlayer(songList, sizeof(songList) / sizeof(songList[0]));
 
 char* titles[7] =
 {
+	//"Tetris",
 	"Bach Partita 2",
 	"Bach Double",
 	"Bach Presto",
@@ -143,11 +145,9 @@ void setup()
 	playerScreen.init();
 	playerScreen.onNextButtonPressed([]() {
 		mp.nextSong();
-		mp.play();
 	});
 	playerScreen.onPreviousPressed([]() {
 		mp.previousSong();
-		mp.play();
 	});
 	playerScreen.onPlayButtonPressed([]() {
 		mp.play();
@@ -157,19 +157,19 @@ void setup()
 	});
 	playerScreen.onListButtonPressed([]() {
 		mp.pause();
-		songListScreen.curPage = mp.currentSong() / 5;
+		songListScreen.setCurrentPage(mp.getCurrentSong() / songListScreen.getItemsPerPage());
 		songListScreen.draw();
 		currentScreen = SONGLIST;
 	});
 	playerScreen.linkVariables([]() {
-		playerScreen.paused = mp.paused;
-		playerScreen.curSong = mp.currentSong();
+		playerScreen.paused = mp.isPaused();
+		playerScreen.setCurrentPage(mp.getCurrentSong());
 		playerScreen.prog = mp.percentComplete();
 	});
 
 	songListScreen.init();
-	songListScreen.onSongButtonPressed([]() {
-		mp.currentSong((songListScreen.curPage * 5) + songListScreen.pressedButton);
+	songListScreen.onListButtonPressed([]() {
+		mp.setCurrentSong(songListScreen.getSelectedItem());
 		mp.play();
 		playerScreen.draw();
 		currentScreen = PLAYER;
@@ -182,8 +182,11 @@ void setup()
 
 	});
 
-	mp.init(22, 24);
+	mp.attachPins(TONE_1_PIN, TONE_2_PIN);
 
+	splashScreen.init();
+	splashScreen.setThemeColor(BLUE);
+	splashScreen.setBackgroundColor(BLACK);
 	splashScreen.draw();
 
 	splashScreen.waitForTap(5000);
@@ -205,15 +208,15 @@ void loop()
 		break;
 	}
 
-	mp.run();
+	mp.process();
 
-	if (mp.songDone)
+	if (mp.donePlaying())
 	{
 		if (t == 0)
 		{
 			t = millis() + 1500;
 		}
-		if (millis() >= t && !mp.paused)
+		if (millis() >= t && !mp.isPaused())
 		{
 			mp.nextSong();
 		}

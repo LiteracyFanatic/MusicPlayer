@@ -39,13 +39,23 @@
 class Screen
 {
 public:
+	virtual void init() = 0;
 	virtual void draw() = 0;
 	virtual void update() = 0;
 	void waitForTap(unsigned long waitTime = NULL);
+	unsigned int getThemeColor();
+	void setThemeColor(unsigned int c);
+	unsigned int getBackgroundColor();
+	void setBackgroundColor(unsigned int c);
 
 protected:
+	TSPoint readPoint();
 	Adafruit_GFX *tft;
 	TouchScreen *ts;
+	int cx;
+	int cy;
+	unsigned int themeColor = WHITE;
+	unsigned int backgroundColor = BLACK;
 	
 };
 

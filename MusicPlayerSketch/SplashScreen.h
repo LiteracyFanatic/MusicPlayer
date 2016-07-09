@@ -16,16 +16,13 @@ class SplashScreen: public Screen
 {
 public:
 	SplashScreen(Adafruit_GFX *gfx, TouchScreen *touchScreen);
+	void init();
 	void draw();
 	void update();
 
 private:
-	//Adafruit_GFX *tft;
-	//TouchScreen *ts;
 	void drawArduinoLogo(unsigned int color);
-
 };
-
 
 #endif
 
