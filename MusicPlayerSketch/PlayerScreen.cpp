@@ -148,8 +148,8 @@ void PlayerScreen::update()
 			drawPauseButton(playPauseButtonX, controlsY, playPauseButtonSize, playPauseButtonSize, backgroundColor);
 			drawPlayButton(playPauseButtonX, controlsY, playPauseButtonSize, playPauseButtonSize, themeColor);
 		}
-		paused = !paused;
 	}
+
 
 	if (listButton.contains(p.x, p.y))
 	{

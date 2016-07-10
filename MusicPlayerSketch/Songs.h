@@ -9,6 +9,12 @@
 	#include "WProgram.h"
 #endif
 
+extern const unsigned int zelda1Notes[] PROGMEM;
+extern const unsigned int zelda1Times[];
+extern const unsigned int zelda2Notes[] PROGMEM;
+extern const unsigned int zelda2Times[] PROGMEM;
+extern const struct Song zeldaSong PROGMEM;
+
 extern const unsigned int tetris1Notes[] PROGMEM;
 extern const unsigned int tetris1Times[] PROGMEM;
 extern const unsigned int tetris2Notes[] PROGMEM;

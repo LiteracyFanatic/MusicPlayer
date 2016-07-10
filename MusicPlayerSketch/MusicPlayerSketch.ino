@@ -82,6 +82,7 @@ const struct Song* songList[] =
 	&bachSong,
 	&castleSong,
 	&marioSong,
+	&zeldaSong,
 	&nyanCatSong,
 	&undertaleSong
 };
@@ -90,7 +91,7 @@ MusicPlayer mp = MusicPlayer(songList, sizeof(songList) / sizeof(songList[0]));
 #define TONE_1_PIN 22
 #define TONE_2_PIN 24
 
-char* titles[7] =
+char* titles[8] =
 {
 	//"Tetris",
 	"Bach Partita 2",
@@ -98,6 +99,7 @@ char* titles[7] =
 	"Bach Presto",
 	"Mario Castle",
 	"Mario Tune",
+	"Zelda Theme",
 	"Nyan Cat",
 	"Bonetrousle"
 };

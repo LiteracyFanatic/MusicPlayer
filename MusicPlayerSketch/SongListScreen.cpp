@@ -35,15 +35,22 @@ void SongListScreen::draw()
 {
 	variableChangeAction();
 	tft->fillScreen(backgroundColor);
-	
+
 	for (byte i = 0; i < itemsPerPage; i++)
 	{
-		listButtons[i].initButton(tft, buttonCenterx, margin + (buttonHeight / 2) + i * (margin + buttonHeight), buttonWidth, buttonHeight, themeColor, themeColor, backgroundColor, titles[i + itemsPerPage * currentPage], 2);
+		if (itemsPerPage * currentPage + i < numberOfItems)
+		{
+			listButtons[i].initButton(tft, buttonCenterx, margin + (buttonHeight / 2) + i * (margin + buttonHeight), buttonWidth, buttonHeight, themeColor, themeColor, backgroundColor, titles[i + itemsPerPage * currentPage], 2);
+		}
+		else
+		{
+			listButtons[i].initButton(tft, 0, 0, 0, 0, themeColor, themeColor, backgroundColor, NULL, 0);
+		}
 	}
 
 	for (byte i = 0; i < itemsPerPage; i++)
 	{
-		if (5 * currentPage + i < numberOfItems)
+		if (itemsPerPage * currentPage + i < numberOfItems)
 		{
 			listButtons[i].drawButton();
 		}
@@ -89,17 +96,20 @@ void SongListScreen::update()
 
 	for (byte i = 0; i < itemsPerPage; i++)
 	{
-		if (listButtons[i].justPressed())
+		if (itemsPerPage * currentPage + i < numberOfItems)
 		{
-			listButtons[i].drawButton(true);
-		}
+			if (listButtons[i].justPressed())
+			{
+				listButtons[i].drawButton(true);
+			}
 
-		if (listButtons[i].justReleased())
-		{
-			listButtons[i].drawButton();
-			selectedItem = (currentPage * itemsPerPage) + i;
-			listButtonAction();
-			return;
+			if (listButtons[i].justReleased())
+			{
+				listButtons[i].drawButton();
+				selectedItem = (currentPage * itemsPerPage) + i;
+				listButtonAction();
+				return;
+			}
 		}
 	}
 
