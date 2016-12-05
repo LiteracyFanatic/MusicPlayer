@@ -9,11 +9,29 @@
 	#include "WProgram.h"
 #endif
 
+extern const unsigned int prestoEModerato1Notes[] PROGMEM;
+extern const unsigned int prestoEModerato1Times[];
+extern const unsigned int prestoEModerato2Notes[] PROGMEM;
+extern const unsigned int prestoEModerato2Times[] PROGMEM;
+extern const struct Song prestoEModeratoSong PROGMEM;
+
+extern const unsigned int larghetto1Notes[] PROGMEM;
+extern const unsigned int larghetto1Times[];
+extern const unsigned int larghetto2Notes[] PROGMEM;
+extern const unsigned int larghetto2Times[] PROGMEM;
+extern const struct Song larghettoSong PROGMEM;
+
 extern const unsigned int zelda1Notes[] PROGMEM;
 extern const unsigned int zelda1Times[];
 extern const unsigned int zelda2Notes[] PROGMEM;
 extern const unsigned int zelda2Times[] PROGMEM;
 extern const struct Song zeldaSong PROGMEM;
+
+extern const unsigned int songOfStorms1Notes[] PROGMEM;
+extern const unsigned int songOfStorms1Times[];
+extern const unsigned int songOfStorms2Notes[] PROGMEM;
+extern const unsigned int songOfStorms2Times[] PROGMEM;
+extern const struct Song songOfStormsSong PROGMEM;
 
 extern const unsigned int tetris1Notes[] PROGMEM;
 extern const unsigned int tetris1Times[] PROGMEM;

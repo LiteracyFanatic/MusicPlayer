@@ -76,32 +76,38 @@ Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 
 const struct Song* songList[] =
 {
-	//&tetrisSong,
+	&prestoEModeratoSong,
+	&larghettoSong,
 	&bachPartita2GigaSong,
 	&bachDoubleSong,
 	&bachSong,
 	&castleSong,
 	&marioSong,
 	&zeldaSong,
+	&songOfStormsSong,
 	&nyanCatSong,
-	&undertaleSong
+	&undertaleSong,
+	&tetrisSong
 };
 
 MusicPlayer mp = MusicPlayer(songList, sizeof(songList) / sizeof(songList[0]));
 #define TONE_1_PIN 22
 #define TONE_2_PIN 24
 
-char* titles[8] =
+char* titles[12] =
 {
-	//"Tetris",
+	"Lake Presto",
+	"Lake Larghetto",
 	"Bach Partita 2",
 	"Bach Double",
 	"Bach Presto",
 	"Mario Castle",
 	"Mario Tune",
 	"Zelda Theme",
+	"Song of Storms",
 	"Nyan Cat",
-	"Bonetrousle"
+	"Bonetrousle",
+	"Tetris"
 };
 
 enum Screens

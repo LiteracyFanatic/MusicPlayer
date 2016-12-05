@@ -1,8 +1,8 @@
-// Song.h
+// MusicPlayer.h
 #include <Tone.h>
 
-#ifndef _SONG_h
-#define _SONG_h
+#ifndef _MUSICPLAYER_h
+#define _MUSICPLAYER_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -12,12 +12,12 @@
 
 struct Song
 {
-	 const unsigned int* notes1;
-	 const unsigned int* times1;
-	 const unsigned int* notes2;
-	 const unsigned int* times2;
-	 const unsigned int notes1Length;
-	 const unsigned int notes2Length;
+	const unsigned int* notes1;
+	const unsigned int* times1;
+	const unsigned int* notes2;
+	const unsigned int* times2;
+	const unsigned int notes1Length;
+	const unsigned int notes2Length;
 };
 
 class MusicPlayer
