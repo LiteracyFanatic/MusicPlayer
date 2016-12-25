@@ -1,3 +1,4 @@
+#include "DedicationScreen.h"
 #include "SplashScreen.h"
 #include "MusicPlayer.h"
 #include "SongListScreen.h"
@@ -118,6 +119,8 @@ enum Screens
 
 SplashScreen splashScreen = SplashScreen(&tft, &ts);
 
+DedicationScreen dedicationScreen = DedicationScreen(&tft, &ts);
+
 PlayerScreen playerScreen = PlayerScreen(&tft, &ts, titles, sizeof(titles) / sizeof(titles[0]));
 
 SongListScreen songListScreen = SongListScreen(&tft, &ts, titles, sizeof(titles) / sizeof(titles[0]));
@@ -198,6 +201,13 @@ void setup()
 	splashScreen.draw();
 
 	splashScreen.waitForTap(5000);
+	
+	dedicationScreen.init();
+	dedicationScreen.setThemeColor(BLUE);
+	dedicationScreen.setBackgroundColor(BLACK);
+	dedicationScreen.draw();
+
+	dedicationScreen.waitForTap(15000);
 
 	playerScreen.draw();
 }

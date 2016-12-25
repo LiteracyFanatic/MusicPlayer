@@ -75,6 +75,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DedicationScreen.h" />
     <ClInclude Include="MusicPlayer.h" />
     <ClInclude Include="PlayerScreen.h" />
     <ClInclude Include="Screen.h" />
@@ -83,6 +84,7 @@
     <ClInclude Include="SplashScreen.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DedicationScreen.cpp" />
     <ClCompile Include="MusicPlayer.cpp" />
     <ClCompile Include="PlayerScreen.cpp" />
     <ClCompile Include="Screen.cpp" />
